@@ -2,8 +2,7 @@
 title: "My title"
 subtitle: "My subtitle if needed"
 author: 
-  - First author
-  - Another author
+  - Hannah Yu
 thanks: "Code and data are available at: LINK."
 date: today
 date-format: long
@@ -18,10 +17,27 @@ bibliography: references.bib
 #| warning: false
 #| message: false
 
+
 library(tidyverse)
-library(palmerpenguins)
+library(here)
+library(rstanarm)
+library(modelsummary)
+library(ggplot2)
+library(knitr)
+library(marginaleffects)
+library(plotly)
+library(tibble)
+library(margins)
+library(kableExtra)
+library(arrow)
+library(gridExtra)
+library(cowplot)
+library(lemon)
 ```
 
+```{r}
+ces2020 <-  read_parquet(here::here("data/analysis_data/cleaned_ces2020.parquet"))
+```
 
 # Introduction
 
@@ -32,45 +48,36 @@ The remainder of this paper is structured as follows. @sec-data....
 
 
 # Data {#sec-data}
+```{r}
+#| label: tbl-clean-data
+#| tbl-cap: "Preview of the cleaned 2020 CES dataset"
+#| message: false
+#| echo: false
+
+ces2020[1:5, 1:11] |>
+  kable()
+```
+
+
+```{r}
+#| label: tbl-summary
+#| tbl-cap: "Statistics summary of the cleaned 2020 CES dataset"
+#| message: false
+#| echo: false
+
+ces2020 |>
+  summary() |>
+  kable()
+```
+
 
 Some of our data is of penguins (@fig-bills), from @palmerpenguins.
 
-```{r}
-#| label: fig-bills
-#| fig-cap: Bills of penguins
-#| echo: false
-
-ggplot(penguins, aes(x = island, fill = species)) +
-  geom_bar(alpha = 0.8) +
-  scale_fill_manual(values = c("darkorange","purple","cyan4"),
-                    guide = "none") +
-  theme_minimal() +
-  facet_wrap(~species, ncol = 1) +
-  coord_flip()
-```
 
 Talk more about it.
 
 And also planes (@fig-planes). (You can change the height and width, but don't worry about doing that until you have finished every other aspect of the paper - Quarto will try to make it look nice and the defaults usually work well once you have enough text.)
 
-```{r}
-#| label: fig-planes
-#| fig-cap: Relationship between wing length and width
-#| echo: false
-#| warning: false
-#| message: false
-
-analysis_data <- read_csv(here::here("data/analysis_data/analysis_data.csv"))
-
-analysis_data |> 
-  ggplot(aes(x = width, y = length)) +
-  geom_point(alpha = 0.8) +
-  theme_minimal() +
-  labs(x = "Wing width (mm)",
-       y = "Wing length (mm)")
-```
-
-Talk way more about it. 
 
 
 
@@ -82,19 +89,34 @@ Here we briefly describe the Bayesian analysis model used to investigate... Back
 
 ## Model set-up
 
-Define $y_i$ as the number of seconds that the plane remained aloft. Then $\beta_i$ is the wing width and $\gamma_i$ is the wing length, both measured in millimeters.  
+I utilized a Bayesian logistic regression model to examine the relationship between voters' political preferences and their media use preferences.The model is formulated as follows:
+
 
 \begin{align} 
-y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
-\mu_i &= \alpha + \beta_i + \gamma_i\\
+y_i|\pi_i &\sim \mbox{Bern}(\pi_i) \\
+\mbox{logit}(\pi_i) &= \alpha + \beta_1 \times \mbox{ABC}_i + \beta_2 \times \mbox{CBS}_i + \beta_3 \times \mbox{NBC}_i + \beta_4 \times \mbox{CNN}_ + \beta_5 \times \mbox{Fox_News}_ + \beta_6 \times \mbox{MSNBC}_ + \beta_7 \times \mbox{PBS}_ + \beta_8 \times \mbox{Other}_ + \beta_9 \times \mbox{TV_type}_ + \beta_10 \times \mbox{Party}\\
 \alpha &\sim \mbox{Normal}(0, 2.5) \\
-\beta &\sim \mbox{Normal}(0, 2.5) \\
-\gamma &\sim \mbox{Normal}(0, 2.5) \\
-\sigma &\sim \mbox{Exponential}(1)
+\beta_1 &\sim \mbox{Normal}(0, 2.5) \\
+\beta_2 &\sim \mbox{Normal}(0, 2.5) \\
+\beta_3 &\sim \mbox{Normal}(0, 2.5) \\
+\beta_4 &\sim \mbox{Normal}(0, 2.5) \\
+\beta_5 &\sim \mbox{Normal}(0, 2.5) \\
+\beta_6 &\sim \mbox{Normal}(0, 2.5) \\
+\beta_7 &\sim \mbox{Normal}(0, 2.5) \\
+\beta_8 &\sim \mbox{Normal}(0, 2.5) \\
+\beta_9 &\sim \mbox{Normal}(0, 2.5) \\
+\beta_10 &\sim \mbox{Normal}(0, 2.5)
 \end{align}
 
-We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
+In this model, $y_i$ represents the binary outcome variable indicating whether an individual voted Biden (as opposed to Trump). The probability of voting for the Biden ($\pi_i$) is modeled using a logistic link function (\text{logit}($\pi_i$)), which is a linear combination of the intercept ($\alpha$) and the coefficients ($\beta_1$, $\beta_2$, $\beta_3$, $\beta_4$, $\beta_5$, $\beta_6$, $\beta_7$, $\beta_8$, $\beta_9$, $\beta_10$)) corresponding to the predictor variables media use networks, TV news type, and party affiliations, respectively. Media use networks are being represented by the following predictor variables: \text{ABC}_i, \text{CBS}_i, \text{NBC}_i, \text{CNN}_i, \text{Fox_News}_i \text{MSNBC}_i ,\text{PBS}_i, and \text{Other}_i. The rest of the predictor variables are denoted as \text{TV_type}_i and \text{Party}_i, where $i$ indexes the individuals in the dataset. 
 
+The intercept and coefficients are assigned informative prior distributions to regularize the model. Specifically, a normal distribution with a mean of 0 and a standard deviation of 2.5 for each parameter is assumed.
+
+This modeling approach is chosen for several reasons. Firstly, logistic regression is well-suited for binary outcome variables, making it appropriate for analyzing voting behavior. Additionally, Bayesian methods enables the incorporation of prior knowledge and uncertainty into our analysis, which provides more robust estimates of the model parameters. Alternative modeling approaches, such as linear regression models, were also considered. However, Bayesian logistic regression is chosen to fit the resulting binary variable of voter's decision.
+
+We run the model in R [@citeR] using the `rstanarm` package of @citeRstanarm. We use the default priors from `rstanarm`. Rstanarm employs Markov chain Monte Carlo (MCMC) techniques to estimate the posterior distribution of the parameters. To avoid excessive runtime, we randomly sampled 2500 observations to fit the model. Model diagnostics, including convergence checks and posterior summaries, are available in the supplementary materials (see Appendix @sec-model-details).
+
+      
 
 ### Model justification
 
@@ -105,6 +127,227 @@ We can use maths by including latex between dollar signs, for instance $\theta$.
 
 # Results
 
+```{r, fig.height = 10, fig.width = 10}
+
+# Create individual plots for each news channel
+plot_ABC <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(ABC))) +
+  geom_bar(position = "dodge") +
+  labs(title = "ABC", x = "Voted for Biden (1) or Trump (0)", y = "Count") +
+  theme_minimal() +
+ # facet_wrap(~ ., ncol = 4) +
+  guides(fill = FALSE)
+
+plot_CBS <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(CBS))) +
+  geom_bar(position = "dodge") +
+  labs(title = "CBS", x = "Voted for Biden (1) or Trump (0)", y = "Count") +
+  theme_minimal() +
+ # facet_wrap(~ ., ncol = 4) +
+  guides(fill = FALSE)
+
+plot_NBC <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(NBC))) +
+  geom_bar(position = "dodge") +
+  labs(title = "NBC", x = "Voted for Biden (1) or Trump (0)", y = "Count") +
+  theme_minimal() +
+ # facet_wrap(~ ., ncol = 4) +
+  guides(fill = FALSE)
+
+plot_CNN <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(CNN))) +
+  geom_bar(position = "dodge") +
+  labs(title = "CNN", x = "Voted for Biden (1) or Trump (0)", y = "Count") +
+  theme_minimal() +
+ # facet_wrap(~ ., ncol = 4) +
+  guides(fill = FALSE)
+
+plot_Fox_News <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(Fox_News))) +
+  geom_bar(position = "dodge") +
+  labs(title = "Fox News", x = "Voted for Biden (1) or Trump (0)", y = "Count") +
+  theme_minimal() +
+#  facet_wrap(~ ., ncol = 4) +
+  guides(fill = FALSE)
+
+plot_MSNBC <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(MSNBC))) +
+  geom_bar(position = "dodge") +
+  labs(title = "MSNBC", x = "Voted for Biden (1) or Trump (0)", y = "Count") +
+  theme_minimal() +
+#  facet_wrap(~ ., ncol = 4) +
+  guides(fill = FALSE)
+
+plot_PBS <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(PBS))) +
+  geom_bar(position = "dodge") +
+  labs(title = "PBS", x = "Voted for Biden (1) or Trump (0)", y = "Count") +
+  theme_minimal() 
+
+plot_Other <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(Other))) +
+  geom_bar(position = "dodge") +
+  labs(title = "PBS", x = "Voted for Biden (1) or Trump (0)", y = "Count") +
+  theme_minimal() +
+  guides(fill = FALSE)
+
+
+legend <- g_legend(plot_PBS + theme(legend.position='bottom'))
+
+grid.arrange(plot_ABC, plot_CBS, plot_NBC, plot_CNN, plot_Fox_News, plot_MSNBC, plot_PBS + theme(legend.position ='none'), plot_Other, legend, nrow = 3)
+
+
+```
+
+```{r, fig.height = 6.6, fig.width = 10}
+
+# Create individual plots for each news channel
+plot_post <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(post))) +
+  geom_bar(position = "dodge") +
+  labs(title = "Posted", x = "Vote", y = "Count") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  coord_cartesian(ylim = c(0, 4000)) +  
+  guides(fill = FALSE)
+
+plot_comment <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(comment))) +
+  geom_bar(position = "dodge") +
+  labs(title = "Commented", x = "Vote", y = "Count") +
+  theme_minimal() +
+  coord_cartesian(ylim = c(0, 4000)) +  
+  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
+ # facet_wrap(~ ., ncol = 4) +
+  guides(fill = FALSE)
+
+plot_read <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(read))) +
+  geom_bar(position = "dodge") +
+  labs(title = "Read", x = "Vote", y = "Count") +
+  theme_minimal() +
+  coord_cartesian(ylim = c(0, 4000)) +
+  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
+ # facet_wrap(~ ., ncol = 4) +
+  guides(fill = FALSE)
+
+plot_follow <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(follow))) +
+  geom_bar(position = "dodge") +
+  labs(title = "Followed", x = "Vote", y = "Count") +
+  theme_minimal() +
+  coord_cartesian(ylim = c(0, 4000)) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+ # facet_wrap(~ ., ncol = 4) +
+  guides(fill = FALSE)
+
+plot_forward <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(forward))) +
+  geom_bar(position = "dodge") +
+  labs(title = "Forwarded", x = "Vote", y = "Count") +
+  coord_cartesian(ylim = c(0, 4000)) +
+  theme_minimal() +
+  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.title = element_text(hjust = 0.5)) 
+
+
+legend <- g_legend(plot_forward + theme(legend.position='bottom', 
+                                        legend.text = element_text(size = 15, face="bold"), 
+                                        legend.title = element_blank()))
+
+grid.arrange(plot_post, plot_comment, plot_read, plot_follow, plot_forward + theme(legend.position ='none'), legend, nrow = 2)
+
+```
+
+
+```{r}
+# Create individual plots for each news channel
+plot_post <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(post, levels = c("not_selected", "selected")))) +
+  geom_bar(position = "stack", stat = "count") +
+  labs(title = "Posted", x = "Vote", y = "Count") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  coord_cartesian(ylim = c(0, 6000)) +  
+  guides(fill = FALSE)
+
+plot_comment <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(comment, levels = c("not_selected", "selected")))) +
+  geom_bar(position = "stack", stat = "count") +
+  labs(title = "Commented", x = "Vote", y = "Count") +
+  theme_minimal() +
+  coord_cartesian(ylim = c(0, 6000)) +  
+  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
+  guides(fill = FALSE)
+
+plot_read <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(read, levels = c("not_selected", "selected")))) +
+  geom_bar(position = "stack", stat = "count") +
+  labs(title = "Read", x = "Vote", y = "Count") +
+  theme_minimal() +
+  coord_cartesian(ylim = c(0, 6000)) +
+  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
+  guides(fill = FALSE)
+
+plot_follow <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(follow, levels = c("not_selected", "selected")))) +
+  geom_bar(position = "stack", stat = "count") +
+  labs(title = "Followed", x = "Vote", y = "Count") +
+  theme_minimal() +
+  coord_cartesian(ylim = c(0, 6000)) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
+  guides(fill = FALSE)
+
+plot_forward <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(forward, levels = c("not_selected", "selected")))) +
+  geom_bar(position = "stack", stat = "count") +
+  labs(title = "Forwarded", x = "Vote", y = "Count") +
+  coord_cartesian(ylim = c(0, 6000)) +
+  theme_minimal() +
+  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.title = element_text(hjust = 0.5)) 
+ # facet_wrap(~ ., ncol = 4) +
+
+
+#legend <- g_legend(plot_forward + theme(legend.position='bottom', 
+                                        #legend.text = element_text(size = 15, face="bold"), 
+                                       # legend.title = element_blank())
+
+grid.arrange(plot_post, plot_comment, plot_read, plot_follow, plot_forward + theme(legend.position ='none'), nrow = 1)
+
+```
+```{r}
+# Change labels for Fox_News variable
+ces2020$Fox_News <- factor(ces2020$Fox_News, labels = c("No", "Yes"))
+
+ggplot(ces2020, aes(x = Fox_News, fill = voted_for)) +
+  geom_bar() +
+  facet_wrap(facets = vars(Party)) +
+  labs(title = "Relationship Between Fox News Consumption and Voting Behavior",
+       x = "Fox News",
+       y = "Count",
+       color = "Voted for Biden (1) or Trump (0)") +
+  scale_fill_brewer(palette = "Set1")
+ # scale_color_manual(values = c("red", "blue")) +  # Customize colors for better visibility
+  theme_minimal()
+```
+```{r}
+# Change labels for Fox_News variable
+ces2020$CNN <- factor(ces2020$CNN, labels = c("No", "Yes"))
+
+ggplot(ces2020, aes(x = CNN, fill = voted_for)) +
+  geom_bar() +
+  facet_wrap(facets = vars(Party)) +
+  labs(title = "Relationship Between CNN Consumption and Voting Behavior",
+       x = "CNN",
+       y = "Count",
+       color = "Voted for Biden (1) or Trump (0)") +
+  scale_fill_brewer(palette = "Set1")
+ # scale_color_manual(values = c("red", "blue")) +  # Customize colors for better visibility
+  theme_minimal()
+```
+
+
+```{r}
+ces2020$TV_type <- factor(ces2020$TV_type, labels = c("National & Local", "National"))
+
+scatter_plot <- ggplot(ces2020, aes(x = TV_type, fill = voted_for)) +
+  geom_bar() +
+  facet_wrap(facets = vars(Party)) +
+  labs(title = "Relationship Between TV News Consumption and Voting Behavior",
+       x = "TV Type",
+       y = "Count",
+       color = "Voted for Biden (1) or Trump (0)") +
+  scale_fill_brewer(palette = "Set1")
+ # scale_color_manual(values = c("red", "blue")) +  # Customize colors for better visibility
+  theme_minimal()
+
+# Show the plot
+scatter_plot
+
+```
+
 Our results are summarized in @tbl-modelresults.
 
 ```{r}
@@ -114,9 +357,9 @@ Our results are summarized in @tbl-modelresults.
 #| message: false
 
 library(rstanarm)
+political_preferences <-
+  readRDS(file = here::here("models/political_preferences.rds"))
 
-first_model <-
-  readRDS(file = here::here("models/first_model.rds"))
 ```
 
 ```{r}
@@ -126,13 +369,39 @@ first_model <-
 #| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
 #| warning: false
 
-modelsummary::modelsummary(
+modelsummary(
   list(
-    "First model" = first_model
+    "Support Biden" = political_preferences
   ),
-  statistic = "mad",
-  fmt = 2
-)
+  statistic = "mad"
+  )
+```
+
+
+```{r}
+# Load necessary libraries
+library(car)
+
+# Check for multicollinearity using VIF
+vif(political_preferences)
+
+# View the model summary
+summary(political_preferences)
+
+```
+
+
+
+
+
+```{r}
+#| echo: false
+#| eval: true
+#| label: tbl-modelresults
+#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
+#| warning: false
+
+
 ```
 
 
@@ -179,15 +448,15 @@ In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. Th
 #| fig-cap: "Examining how the model fits, and is affected by, the data"
 #| fig-subcap: ["Posterior prediction check", "Comparing the posterior with the prior"]
 
-pp_check(first_model) +
-  theme_classic() +
-  theme(legend.position = "bottom")
+#pp_check(first_model) +
+ # theme_classic() +
+ # theme(legend.position = "bottom")
 
-posterior_vs_prior(first_model) +
-  theme_minimal() +
-  scale_color_brewer(palette = "Set1") +
-  theme(legend.position = "bottom") +
-  coord_flip()
+#posterior_vs_prior(first_model) +
+  #theme_minimal() +
+ # scale_color_brewer(palette = "Set1") +
+ # theme(legend.position = "bottom") +
+ # coord_flip()
 ```
 
 ## Diagnostics
@@ -206,13 +475,135 @@ posterior_vs_prior(first_model) +
 #| fig-subcap: ["Trace plot", "Rhat plot"]
 #| layout-ncol: 2
 
-plot(first_model, "trace")
+#plot(first_model, "trace")
 
-plot(first_model, "rhat")
+#plot(first_model, "rhat")
+```
+
+```{r}
+#| label: fig-post_dist
+#| fig-cap: Posterior distribution for logistic regression model 
+#| echo: false
+#| warning: false
+#| message: false
+
+pp_check(political_preferences) +
+  theme(legend.position = "bottom")
+```
+
+```{r}
+#| label: fig-post_prior
+#| fig-cap: Comparing the posterior with the prior 
+#| echo: false
+#| warning: false
+#| message: false
+
+#### Read data ####
+analysis_data1 <- read_parquet(here::here("data/analysis_data/cleaned_ces2020.parquet"))
+
+# Convert variables to factors
+#analysis_data$race <- factor(analysis_data$race)
+#analysis_data$region <- factor(analysis_data$region)
+#analysis_data$employ <- factor(analysis_data$employ)
+
+# Create voted_for variable in binary form
+analysis_data1$voted_for_binary <- ifelse(analysis_data1$voted_for == "Biden", 1, 0)
+
+# Model 1 for n = 1000
+set.seed(853)
+
+ces2020_reduced <- 
+  analysis_data1 |> 
+  slice_sample(n = 2500)
+
+posterior_vs_prior(political_preferences, size = 0.3) +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  theme(axis.text.x=element_text(hjust=1, vjust=0.5),
+        text=element_text(size=8)) +
+  coord_flip()
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| message: false
+#| warning: false
+#| label: fig-trace1
+#| fig-cap: "Trace plot of intercept and race"
+#| fig-subcap: ["Trace plot of Intercept", "Trace plot of race White", "Trace plot of race Black", "Trace plot of race Hispanic", "Trace plot of race Middle Eastern", "Trace plot of race Native American", "Trace plot of race Two or more races", "Trace plot of race Other"]
+#| layout-ncol: 2
+
+#plot(political_preferences1, "trace")
+plot(political_preferences, "trace", "(Intercept)")
+
+plot(political_preferences, "trace", "ABCYes")
+plot(political_preferences, "trace", "CBSYes")
+plot(political_preferences, "trace", "NBCYes")
+plot(political_preferences, "trace", "CNNYes")
+plot(political_preferences, "trace", "Fox_NewsYes")
+plot(political_preferences, "trace", "MSNBCYes")
+plot(political_preferences, "trace", "PBSYes")
+plot(political_preferences, "trace", "OtherYes")
+
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| message: false
+#| warning: false
+#| label: fig-trace2
+#| fig-cap: "Trace plot of region"
+#| fig-subcap: ["Trace plot of region Northeast", "Trace plot of region South", "Trace plot of region West"]
+#| layout-ncol: 2
+
+plot(political_preferences, "trace", "TV_typeNational Newscast")
 ```
 
 
+```{r}
+#| echo: false
+#| eval: true
+#| message: false
+#| warning: false
+#| label: fig-trace3
+#| fig-cap: "Trace plot of region"
+#| fig-subcap: ["Trace plot of region Northeast", "Trace plot of region South", "Trace plot of region West"]
+#| layout-ncol: 2
 
+plot(political_preferences, "trace", "PartyIndependent")
+plot(political_preferences, "trace", "PartyOther")
+plot(political_preferences, "trace", "PartyRepublican")
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| message: false
+#| warning: false
+#| label: fig-rhat
+#| fig-cap: "Rhat plot"
+
+plot(political_preferences, "rhat")
+```
+
+ 
+
+## Credibility Interval {#sec-credibility-interval}
+@fig-modelresults1 shows the 90% credibility interval for the model.
+
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+#| label: fig-modelresults1
+#| fig-cap: "Credible intervals for predictors of support for Biden"
+
+modelplot(political_preferences, conf_level = 0.90, size = 0.2) +
+  labs(x = "90% credibility interval")
+```
 \newpage
 
 
