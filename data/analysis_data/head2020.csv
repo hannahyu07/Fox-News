@@ -1,0 +1,101 @@
+voted_for,ABC,CBS,NBC,CNN,Fox_News,MSNBC,PBS,Other,TV_type,Party,voted_for_binary
+Trump,No,No,No,No,Yes,No,No,No,National Newscast,Republican,0
+Biden,No,No,No,Yes,Yes,No,No,No,Both,Democrat,1
+Trump,No,No,No,No,Yes,No,No,No,National Newscast,Independent,0
+Biden,No,Yes,No,Yes,No,Yes,No,No,Both,Democrat,1
+Trump,No,No,Yes,No,Yes,No,No,No,Both,Republican,0
+Biden,No,No,Yes,No,No,No,No,No,Both,Other,1
+Trump,No,No,No,No,Yes,No,No,No,Both,Republican,0
+Biden,Yes,No,No,No,No,No,No,No,National Newscast,Democrat,1
+Trump,No,No,Yes,No,Yes,No,No,No,Both,Republican,0
+Biden,No,Yes,No,Yes,No,No,No,No,Both,Democrat,1
+Trump,No,No,No,No,Yes,No,No,No,National Newscast,Independent,0
+Biden,No,Yes,No,No,No,No,No,No,Both,Other,1
+Biden,No,No,Yes,Yes,No,Yes,No,No,National Newscast,Democrat,1
+Biden,No,No,Yes,Yes,No,No,Yes,No,Both,Democrat,1
+Trump,No,No,No,No,Yes,No,No,Yes,Both,Republican,0
+Trump,No,Yes,No,No,Yes,No,No,No,Both,Republican,0
+Biden,Yes,No,No,Yes,No,Yes,No,No,Both,Democrat,1
+Biden,No,No,No,No,No,Yes,No,No,National Newscast,Democrat,1
+Biden,Yes,Yes,Yes,No,No,No,No,No,Both,Democrat,1
+Biden,No,No,No,No,No,No,No,Yes,National Newscast,Democrat,1
+Biden,No,Yes,Yes,Yes,Yes,Yes,No,No,Both,Independent,1
+Trump,No,No,Yes,No,Yes,No,No,No,Both,Republican,0
+Trump,No,No,No,No,Yes,No,No,No,National Newscast,Republican,0
+Trump,No,No,No,No,Yes,No,No,Yes,Both,Independent,0
+Biden,No,No,No,No,No,Yes,No,No,National Newscast,Democrat,1
+Biden,Yes,Yes,Yes,Yes,No,Yes,Yes,Yes,Both,Independent,1
+Trump,No,No,No,No,No,No,No,Yes,National Newscast,Republican,0
+Trump,Yes,Yes,No,Yes,Yes,No,No,No,Both,Republican,0
+Biden,No,No,No,No,No,Yes,No,No,National Newscast,Independent,1
+Trump,No,No,Yes,No,Yes,No,No,No,Both,Other,0
+Biden,No,No,Yes,No,No,No,No,No,National Newscast,Independent,1
+Trump,No,No,No,No,Yes,No,No,No,National Newscast,Republican,0
+Biden,Yes,Yes,Yes,No,No,No,Yes,No,Both,Democrat,1
+Biden,No,No,Yes,Yes,No,Yes,No,No,Both,Democrat,1
+Biden,No,No,Yes,Yes,No,No,No,Yes,Both,Democrat,1
+Trump,No,No,Yes,No,Yes,No,No,No,Both,Republican,0
+Trump,No,No,No,No,Yes,No,Yes,Yes,National Newscast,Independent,0
+Trump,No,No,No,No,Yes,No,No,No,Both,Republican,0
+Biden,No,No,No,Yes,No,Yes,No,No,National Newscast,Independent,1
+Trump,Yes,No,No,Yes,Yes,No,No,No,Both,Independent,0
+Trump,No,No,No,No,Yes,No,No,No,Both,Republican,0
+Trump,No,No,No,No,Yes,No,No,No,National Newscast,Republican,0
+Biden,No,Yes,No,Yes,No,Yes,Yes,No,Both,Democrat,1
+Trump,No,No,No,No,Yes,No,No,No,Both,Republican,0
+Biden,No,No,Yes,No,No,No,No,No,Both,Democrat,1
+Trump,No,No,Yes,No,Yes,No,No,No,National Newscast,Independent,0
+Biden,No,No,No,Yes,No,No,No,No,Both,Democrat,1
+Trump,No,No,Yes,No,Yes,No,No,No,Both,Republican,0
+Trump,No,No,No,No,Yes,No,No,No,Both,Republican,0
+Biden,No,No,No,Yes,No,No,Yes,No,Both,Democrat,1
+Biden,Yes,No,No,Yes,No,Yes,No,No,Both,Democrat,1
+Trump,Yes,No,No,No,Yes,Yes,No,No,Both,Republican,0
+Biden,Yes,Yes,Yes,Yes,No,Yes,Yes,No,Both,Democrat,1
+Biden,Yes,Yes,No,Yes,No,No,No,No,Both,Democrat,1
+Biden,No,No,Yes,No,No,No,Yes,No,Both,Independent,1
+Biden,No,Yes,No,No,No,Yes,No,No,Both,Democrat,1
+Biden,Yes,No,No,Yes,No,No,Yes,No,National Newscast,Democrat,1
+Biden,No,No,No,Yes,No,Yes,Yes,No,Both,Democrat,1
+Trump,No,No,No,No,Yes,No,No,No,National Newscast,Republican,0
+Biden,No,No,Yes,No,No,Yes,No,No,Both,Independent,1
+Biden,No,No,No,Yes,No,Yes,No,No,National Newscast,Democrat,1
+Biden,Yes,No,No,No,No,No,No,No,Both,Democrat,1
+Trump,Yes,No,No,No,Yes,Yes,No,No,Both,Republican,0
+Trump,Yes,Yes,Yes,No,Yes,No,No,No,Both,Republican,0
+Biden,No,No,No,Yes,Yes,No,No,No,Both,Democrat,1
+Biden,No,No,Yes,No,No,No,No,No,Both,Democrat,1
+Biden,Yes,Yes,Yes,Yes,No,No,No,No,Both,Democrat,1
+Trump,No,Yes,Yes,No,Yes,No,No,No,Both,Republican,0
+Biden,No,Yes,Yes,Yes,No,Yes,No,No,Both,Democrat,1
+Trump,No,No,No,No,Yes,No,No,No,National Newscast,Republican,0
+Trump,No,No,No,No,Yes,No,No,No,Both,Republican,0
+Trump,No,No,No,No,Yes,No,No,No,National Newscast,Republican,0
+Biden,No,No,No,Yes,No,Yes,No,No,National Newscast,Independent,1
+Biden,No,No,No,Yes,No,No,No,No,National Newscast,Democrat,1
+Biden,No,No,No,No,No,Yes,No,No,National Newscast,Democrat,1
+Biden,Yes,No,No,Yes,No,No,No,No,Both,Democrat,1
+Trump,No,No,Yes,Yes,No,No,No,No,Both,Republican,0
+Biden,No,Yes,No,Yes,No,No,No,No,Both,Democrat,1
+Trump,Yes,No,No,No,No,No,No,No,Both,Democrat,0
+Trump,No,Yes,No,No,No,No,No,No,Both,Republican,0
+Biden,No,No,Yes,No,No,Yes,No,No,Both,Democrat,1
+Trump,Yes,Yes,Yes,No,Yes,No,No,No,Both,Republican,0
+Biden,Yes,Yes,Yes,No,Yes,No,No,No,Both,Democrat,1
+Biden,Yes,Yes,Yes,Yes,Yes,No,No,No,Both,Democrat,1
+Biden,No,Yes,Yes,No,No,Yes,No,No,Both,Democrat,1
+Biden,No,Yes,Yes,No,No,Yes,No,No,Both,Democrat,1
+Biden,No,No,No,No,No,No,Yes,No,National Newscast,Democrat,1
+Biden,No,Yes,No,Yes,Yes,No,No,No,Both,Democrat,1
+Biden,Yes,No,No,Yes,No,Yes,No,No,National Newscast,Democrat,1
+Biden,Yes,Yes,No,Yes,No,No,No,No,Both,Democrat,1
+Trump,Yes,Yes,Yes,No,Yes,No,No,No,Both,Independent,0
+Biden,No,No,No,Yes,No,No,No,No,National Newscast,Democrat,1
+Trump,No,No,No,No,Yes,No,No,No,Both,Republican,0
+Biden,No,Yes,Yes,No,No,No,Yes,No,National Newscast,Democrat,1
+Trump,No,Yes,No,No,Yes,No,No,No,Both,Republican,0
+Trump,Yes,Yes,Yes,No,Yes,No,No,No,Both,Other,0
+Trump,No,No,Yes,No,No,No,No,No,Both,Independent,0
+Trump,Yes,Yes,No,No,No,No,No,No,Both,Republican,0
+Trump,No,No,No,No,No,No,No,Yes,National Newscast,Independent,0
+Biden,No,No,No,No,No,Yes,No,No,Both,Democrat,1

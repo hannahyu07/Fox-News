@@ -28,15 +28,56 @@ library(marginaleffects)
 library(plotly)
 library(tibble)
 library(margins)
+library(testthat)
 library(kableExtra)
 library(arrow)
 library(gridExtra)
-library(cowplot)
-library(lemon)
+
+#library(cowplot)
+#library(lemon)
 ```
 
 ```{r}
 ces2020 <-  read_parquet(here::here("data/analysis_data/cleaned_ces2020.parquet"))
+```
+
+```{r}
+#| include: false
+#| warning: false
+#| message: false
+
+# change column type to factor
+ces2020 <-
+  ces2020 |>
+  mutate(
+    voted_for = as_factor(voted_for),
+    ABC = as_factor(ABC),
+    CBS = as_factor(CBS),
+    NBC = as_factor(NBC),
+    CNN = as_factor(CNN),
+    Fox_News = as_factor(Fox_News),
+    MSNBC = as_factor(MSNBC),
+    PBS = as_factor(PBS),
+    Other = as_factor(Other),
+    TV_type = factor(
+      TV_type,
+      levels = c(
+        "Local Newscast",
+        "National Newscast",
+        "Both"
+      )
+    ),
+    Party = factor(
+      Party,
+      levels = c(
+        "Democrat",
+        "Republican",
+        "Independent",
+        "Other"
+      )
+    )
+  ) |>
+  select(voted_for, ABC, CBS, NBC, CNN, Fox_News, MSNBC, PBS, Other, TV_type, Party)
 ```
 
 # Introduction
@@ -45,9 +86,18 @@ You can and should cross-reference sections and sub-sections. We use @citeR and 
 
 The remainder of this paper is structured as follows. @sec-data....
 
-
+https://onlinelibrary.wiley.com/doi/full/10.1111/j.1467-9477.2011.00284.x    
 
 # Data {#sec-data}
+
+Data analysis is performed using statistical programming language R [@citeR], with packages `tidyverse` [@citeTidyverse], `here` [@citeHere], `rstanarm` [@citeRstanarm], `modelsummary` [@citeModleSummary], `ggplot2` [@citeGgplot2], `knitr` [@citeKnitr], `marginaleffects` [@citeMarginalEffects], `plotly` [@citePlotly], `tibble` [@citeTibble], `margins` [@citeMargins], `testthat` [@citetestthat] and `kableExtra` [@citeKableExtra].
+
+## Data Source
+
+Data for this research comes from the 2020 Cooperative Election Study (CES) [@citeCes2020], a annual US political survey. The CES contains information about Americans' political view, voting behaviours and experiences across various political geography and social context. 61,000 American adults participated in the survey in 2020.
+
+## Data Cleaning and Variables
+
 ```{r}
 #| label: tbl-clean-data
 #| tbl-cap: "Preview of the cleaned 2020 CES dataset"
@@ -58,6 +108,77 @@ ces2020[1:5, 1:11] |>
   kable()
 ```
 
+```{r}
+#| include: false
+#| warning: false
+#| message: false
+
+# change column type to factor
+ces2020 <-
+  ces2020 |>
+  mutate(
+    voted_for = as_factor(voted_for),
+    ABC = as_factor(ABC),
+    CBS = as_factor(CBS),
+    NBC = as_factor(NBC),
+    CNN = as_factor(CNN),
+    Fox_News = as_factor(Fox_News),
+    MSNBC = as_factor(MSNBC),
+    PBS = as_factor(PBS),
+    Other = as_factor(Other),
+    TV_type = factor(
+      TV_type,
+      levels = c(
+        "Local Newscast",
+        "National Newscast",
+        "Both"
+      )
+    ),
+    Party = factor(
+      Party,
+      levels = c(
+        "Democrat",
+        "Republican",
+        "Independent",
+        "Other"
+      )
+    )
+  ) |>
+  select(voted_for, ABC, CBS, NBC, CNN, Fox_News, MSNBC, PBS, Other, TV_type, Party)
+```
+
+
+Since this paper focuses on analyzing the influence of media usage on registered voters decision, I perform the following data cleaning process and selected the related variables. The dataset is cleaned by renaming the column names, changing the variable for from categorical to dummy, selecting the variables of interest, and filtering out missing information and information not related to the study. After cleaning, there are 10331 rows of data remain in the cleaned dataset.  @tbl-clean-data shows a preview of the cleaned dataset.
+
+The dependent variable of my examination is: `presvote20post`, renamed to `voted_for`. This variable represents the presidential candidate the respondent voted for in the 2020 election in the form of a numerical variable. The variable `votereg` represents whether the respondent is registered to vote using numerical numbers. This paper will only analyze respondents who are registered to vote and focus on the outcome of two candidates, Joe Biden representing the Democratic party and Donald Trump representing the Republican party. To analyze the observations of interest, I first limited the observations to the ones that responded "Yes" in `votereg`. And I filtered the responses in `presvote20post` to only "Biden" or "Trump" and converted the variable into a dummy variable where 1 represents "Biden" and 0 represents "Trump". Rest of the variable this paper focuses on are being divided into three categories: Media Use - Networks, Media Use - TV Type, and Party Affiliation.
+ 
+Media Use - Networks:
+
+-   `CC20_300b_1`, renamed to `ABC`,
+
+    -   This variable reports if the respondent watches ABC. A value of 1 signifies that the respondent does watch ABC, while 2 indicates otherwise. This variable was converted into a dummy variable, where 1 represents "Yes" and 0 represents "No". 
+    
+-   `CC20_300b_2`, renamed to `CBS`,
+
+    -   This variable reports if the respondent watches CBS. A value of 1 signifies that the respondent does watch CBS, while 2 indicates otherwise. This variable was converted into a dummy variable, where 1 represents "Yes" and 0 represents "No". 
+    
+-   `CC20_300b_3`, renamed to `NBC`; `CC20_300b_4`, renamed to `CNN`; `CC20_300b_5`, renamed to `Fox_News`; `CC20_300b_6`, renamed to `MSNBC`; `CC20_300b_7`, renamed to `PBS`; `CC20_300b_8`, renamed to `Other`,
+
+    -   The interpretation and cleaning process of these variables are the same as `CBS` and `ABC`. 
+    
+Media Use - TV Type:
+
+-   `CC20_300a`, renamed to `TV_type`,
+
+    -   This variable reports on what kind of TV news the respondent watches. A value of 1 signifies that the respondent watches "Local Newcast", 2 signifies "National Newscast"; 3 "Both". 
+
+
+Party Affiliation:
+
+-   `CC20_433a`, renamed to `Party`,
+
+    -   This variable reports if the respondent political party affiliation. A value of 1 signifies that the respondent identifies as "Democrat", 2 signifies "Republican"; 3 "Independent", and 4 "Other". 
+
 
 ```{r}
 #| label: tbl-summary
@@ -67,17 +188,28 @@ ces2020[1:5, 1:11] |>
 
 ces2020 |>
   summary() |>
-  kable()
+  kable() |>
+  kable_styling()
+
 ```
+@tbl-summary presents a summary of the cleaned data, showing detailed statistics about the dataset. It is evident that Biden has more supporters in this election. The seven listed media networks capture the majority networks people watch; while `Other` captures the rest. Due to the small number of respondents that only watch local newscast and missing values associated with this variable, the number of respondents that only watches local newscast becomes 0 after cleaning. Therefore, the value "Local Newscast" is excluded from later examinations and modelings. There are more respondents identifying as Democrat than than any other party. There are almost equal amount of Republicans and Independent voters; and only 534 voters identified as "Other."
 
 
-Some of our data is of penguins (@fig-bills), from @palmerpenguins.
+## Data Measurement
 
+Because the data was collected from surveys, there might be some inconsistencies and misinterpretations of the questions in people's responses. Therefore this section disects on what the variables are measuring. 
 
-Talk more about it.
+each of our variable is only representable for the following scenarios.  
 
-And also planes (@fig-planes). (You can change the height and width, but don't worry about doing that until you have finished every other aspect of the paper - Quarto will try to make it look nice and the defaults usually work well once you have enough text.)
+Firstly, for the variable `votereg` indicating whether a respondent is registered to vote, the variable relies on self-reported information from survey respondents. Due to the inefficiencies of the US voter registration system, people who misunderstood their voter registration status might falsely reported their condition. For example, some individuals might believe they reached the status simply because they are of age but did not actually register at their local office. According to @inaccurate, there are millions of voter registrations that are no longer valid or inaccurate. 
 
+Representing the presidential candidate the respondent voted for, `CC20_410` takes into account of recall bias and social desirability bias along with people's reported presidential candidate preference. Trump had made many controversial speeches throughout his presidency that contributed to his polarizing image and unpopularity in mainstream media. Therefore, many of his voters would conceal their support due to social pressure, potentially leading to under-reporting of votes for Trump in the survey data.
+
+People's media use networks is being represented by if  `ABC`, `CBS`, `NBC`, `CNN`, `Fox_News`, `MSNBC`, `PBS`, and `Other`. Relying on people's self-reported preferences, these variables are also subject to recall bias. Respondents might overestimate or underestimate their consumptions of certain network based on the content. They might only report the network which reported news that left a strong impression on them. In addition, respondents might choose to conceal their consumptions of certain media networks due to the network's political affiliation or reputation. 
+
+`TV_type` reports the respondents' preference in local newscast or national newscast (or both). The main concern over this variable lies in the fact that after data cleaning, the number of respondents exclusively watching local newscasts became zero due to missing values associated with this variable. The fact that many missing values are related to this variable could have unobservable implications that require future examinations. Therefore this study excludes the effect of only watching local newscast, and centers on people either only consume national newscast or both. 
+
+The variable `Party` categories respondents into four categories. Only having four categories might overlook the nuanced and diverse political beliefs held by individuals. Some may have hybrid or unconventional political views that don't fit neatly into these categories. Therefore, their categorization might not accurately describe their party affiliations. 
 
 
 
@@ -94,7 +226,7 @@ I utilized a Bayesian logistic regression model to examine the relationship betw
 
 \begin{align} 
 y_i|\pi_i &\sim \mbox{Bern}(\pi_i) \\
-\mbox{logit}(\pi_i) &= \alpha + \beta_1 \times \mbox{ABC}_i + \beta_2 \times \mbox{CBS}_i + \beta_3 \times \mbox{NBC}_i + \beta_4 \times \mbox{CNN}_ + \beta_5 \times \mbox{Fox_News}_ + \beta_6 \times \mbox{MSNBC}_ + \beta_7 \times \mbox{PBS}_ + \beta_8 \times \mbox{Other}_ + \beta_9 \times \mbox{TV_type}_ + \beta_10 \times \mbox{Party}\\
+\mbox{logit}(\pi_i) &= \alpha + \beta_1 \times \mbox{ABC}_i + \beta_2 \times \mbox{CBS}_i + \beta_3 \times \mbox{NBC}_i + \beta_4 \times \mbox{CNN}_i + \beta_5 \times \mbox{Fox_News}_i + \beta_6 \times \mbox{MSNBC}_i + \beta_7 \times \mbox{PBS}_i + \beta_8 \times \mbox{Other}_i + \beta_9 \times \mbox{TV_type}_i + \beta_{10} \times \mbox{Party}_i\\
 \alpha &\sim \mbox{Normal}(0, 2.5) \\
 \beta_1 &\sim \mbox{Normal}(0, 2.5) \\
 \beta_2 &\sim \mbox{Normal}(0, 2.5) \\
@@ -108,234 +240,380 @@ y_i|\pi_i &\sim \mbox{Bern}(\pi_i) \\
 \beta_10 &\sim \mbox{Normal}(0, 2.5)
 \end{align}
 
+
 In this model, $y_i$ represents the binary outcome variable indicating whether an individual voted Biden (as opposed to Trump). The probability of voting for the Biden ($\pi_i$) is modeled using a logistic link function (\text{logit}($\pi_i$)), which is a linear combination of the intercept ($\alpha$) and the coefficients ($\beta_1$, $\beta_2$, $\beta_3$, $\beta_4$, $\beta_5$, $\beta_6$, $\beta_7$, $\beta_8$, $\beta_9$, $\beta_10$)) corresponding to the predictor variables media use networks, TV news type, and party affiliations, respectively. Media use networks are being represented by the following predictor variables: \text{ABC}_i, \text{CBS}_i, \text{NBC}_i, \text{CNN}_i, \text{Fox_News}_i \text{MSNBC}_i ,\text{PBS}_i, and \text{Other}_i. The rest of the predictor variables are denoted as \text{TV_type}_i and \text{Party}_i, where $i$ indexes the individuals in the dataset. 
 
 The intercept and coefficients are assigned informative prior distributions to regularize the model. Specifically, a normal distribution with a mean of 0 and a standard deviation of 2.5 for each parameter is assumed.
 
 This modeling approach is chosen for several reasons. Firstly, logistic regression is well-suited for binary outcome variables, making it appropriate for analyzing voting behavior. Additionally, Bayesian methods enables the incorporation of prior knowledge and uncertainty into our analysis, which provides more robust estimates of the model parameters. Alternative modeling approaches, such as linear regression models, were also considered. However, Bayesian logistic regression is chosen to fit the resulting binary variable of voter's decision.
 
-We run the model in R [@citeR] using the `rstanarm` package of @citeRstanarm. We use the default priors from `rstanarm`. Rstanarm employs Markov chain Monte Carlo (MCMC) techniques to estimate the posterior distribution of the parameters. To avoid excessive runtime, we randomly sampled 2500 observations to fit the model. Model diagnostics, including convergence checks and posterior summaries, are available in the supplementary materials (see Appendix @sec-model-details).
+We run the model in R [@citeR] using the `rstanarm` package of [@citeRstanarm]. We use the default priors from `rstanarm`. Rstanarm employs Markov chain Monte Carlo (MCMC) techniques to estimate the posterior distribution of the parameters. To avoid excessive runtime, we randomly sampled 2500 observations to fit the model. Model diagnostics, including convergence checks and posterior summaries, are available in the supplementary materials (see Appendix @sec-model-details).
 
       
 
 ### Model justification
 
-We expect a positive relationship between the size of the wings and time spent aloft. In particular...
+A positive relationship between watching left leaning (Democrat) media networks and voting for Biden; and a similar positive relationship between watching right leaning (Republican) media networks and voting for Trump. In particular, according to @grieco2020americans, among the 7 networks identified in this study, Fox News is known as the most conservative media network while CNN and MSNBC stand as leading liberal media. Slightly leaning left, ABC, CBS, and NBC are generally neutral. PBS is also more liberal and Democratic leaning, but not as extreme as CNN or MSNBC [@blake2014ranking]. This is assumption is made based on the findings that state exposure to media network would have a influence on voter [@wettstein2017media]. 
 
-We can use maths by including latex between dollar signs, for instance $\theta$.
+As most news and media outlets are more liberal leaning, I expect a slightly higher chance of voting for Biden for voters who watch both local and national newscasts. Local newscast might be more be perceived as more trustworthy and more community oriented; therefore, viewers may tend accept content and political opinions from local newscast more easily. On the other hand, voters who exclusively watch national news may adopt a more cautious approach and be less inclined to uncritically accept the material presented to them. Therefore, voters who watch both local and national newscasts might have a slightly higher chance of supporting Biden. 
 
+In terms of the relationship of party affiliation and voting choices. There is an easy assumption; the majority of Democrat voters would vote for their candidate Biden, and almost all Republicans voting for Trump. I except a even voting outcomes from Independent and Other voters as they have not express their preferences between the two.
+
+In terms of the relationship between party affiliation and voting choices, it's reasonable to expect that the majority of Democrat voters would support their candidate, Biden, while a significant portion of Republican voters would favor Trump. This expectation is based on historical voting patterns and the ideological alignment between these parties and their respective candidates. However, it's less predictable how Independent and Other voters might vote, as they have not explicitly expressed their preferences between the two main candidates. Therefore, I anticipate half of the votes go to Biden and half to Trump. 
+
+
+
+
+
+
+```{r}
+
+ggplot(ces2020, aes(x = factor(voted_for), fill = PBS)) +
+  geom_bar(position = "dodge") +
+  labs(title = "PBS", x = "Voted for Biden (1) or Trump (0)", y = "Count") +
+  theme_minimal()
+```
 
 # Results
 
-```{r, fig.height = 10, fig.width = 10}
+## Data Results
 
+
+```{r, fig.height = 10, fig.width = 10}
+#| label: fig-network
+#| fig-cap: Distribution of Presidential Preferences by Network
+#| echo: false
+#| warning: false
+#| message: false
+#| 
 # Create individual plots for each news channel
 plot_ABC <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(ABC))) +
   geom_bar(position = "dodge") +
   labs(title = "ABC", x = "Voted for Biden (1) or Trump (0)", y = "Count") +
-  theme_minimal() +
- # facet_wrap(~ ., ncol = 4) +
-  guides(fill = FALSE)
+  theme_minimal() 
+  #guides(fill = FALSE)
 
 plot_CBS <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(CBS))) +
   geom_bar(position = "dodge") +
   labs(title = "CBS", x = "Voted for Biden (1) or Trump (0)", y = "Count") +
-  theme_minimal() +
+  theme_minimal() #+
  # facet_wrap(~ ., ncol = 4) +
-  guides(fill = FALSE)
+  #guides(fill = FALSE)
 
 plot_NBC <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(NBC))) +
   geom_bar(position = "dodge") +
   labs(title = "NBC", x = "Voted for Biden (1) or Trump (0)", y = "Count") +
-  theme_minimal() +
+  theme_minimal() #+
  # facet_wrap(~ ., ncol = 4) +
-  guides(fill = FALSE)
+  #guides(fill = FALSE)
 
 plot_CNN <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(CNN))) +
   geom_bar(position = "dodge") +
   labs(title = "CNN", x = "Voted for Biden (1) or Trump (0)", y = "Count") +
-  theme_minimal() +
+  theme_minimal() #+
  # facet_wrap(~ ., ncol = 4) +
-  guides(fill = FALSE)
+  #guides(fill = FALSE)
 
 plot_Fox_News <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(Fox_News))) +
   geom_bar(position = "dodge") +
   labs(title = "Fox News", x = "Voted for Biden (1) or Trump (0)", y = "Count") +
-  theme_minimal() +
+  theme_minimal()# +
 #  facet_wrap(~ ., ncol = 4) +
-  guides(fill = FALSE)
+ # guides(fill = FALSE)
 
 plot_MSNBC <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(MSNBC))) +
   geom_bar(position = "dodge") +
   labs(title = "MSNBC", x = "Voted for Biden (1) or Trump (0)", y = "Count") +
-  theme_minimal() +
+  theme_minimal()# +
 #  facet_wrap(~ ., ncol = 4) +
-  guides(fill = FALSE)
+  #guides(fill = FALSE)
 
-plot_PBS <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(PBS))) +
+plot_PBS <- ggplot(ces2020, aes(x = factor(voted_for), fill = PBS)) +
   geom_bar(position = "dodge") +
   labs(title = "PBS", x = "Voted for Biden (1) or Trump (0)", y = "Count") +
-  theme_minimal() 
+  theme_minimal()
 
 plot_Other <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(Other))) +
   geom_bar(position = "dodge") +
-  labs(title = "PBS", x = "Voted for Biden (1) or Trump (0)", y = "Count") +
-  theme_minimal() +
-  guides(fill = FALSE)
+  labs(title = "Other", x = "Voted for Biden (1) or Trump (0)", y = "Count") +
+  theme_minimal()# +
+  #guides(fill = FALSE)
 
 
 legend <- g_legend(plot_PBS + theme(legend.position='bottom'))
 
-grid.arrange(plot_ABC, plot_CBS, plot_NBC, plot_CNN, plot_Fox_News, plot_MSNBC, plot_PBS + theme(legend.position ='none'), plot_Other, legend, nrow = 3)
+grid.arrange(plot_ABC, plot_CBS, plot_NBC, plot_CNN, plot_Fox_News, plot_MSNBC, plot_PBS, plot_Other, legend, nrow = 3)
+
+#grid.arrange(plot_ABC, plot_CBS, plot_NBC, plot_CNN, plot_Fox_News, plot_MSNBC, plot_PBS + #theme(legend.position ='none'), plot_Other, legend, nrow = 3)
 
 
 ```
+```{r, fig.height = 10, fig.width = 10}
+#| label: fig-network
+#| fig-cap: Distribution of Presidential Preferences by Network
+#| echo: false
+#| warning: false
+#| message: false
+# Create individual plots for each news channel
+plot_ABC <- ggplot(ces2020, aes(x = factor(ABC), fill = factor(voted_for))) +
+  geom_bar(position = "dodge") +
+  labs(title = "ABC", x = "ABC", y = "Count") +
+  scale_fill_manual(values = c("red", "blue")) +  # Specify colors for Biden and Trump
+  theme_minimal()+
+  theme(plot.title = element_text(hjust = 0.5))  # Center the title horizontally
+
+
+plot_CBS <- ggplot(ces2020, aes(x = factor(CBS), fill = factor(voted_for))) +
+  geom_bar(position = "dodge") +
+  labs(title = "CBS", x = "CBS", y = "Count") +
+  scale_fill_manual(values =  c("red", "blue")) +  # Specify colors for Biden and Trump
+  theme_minimal()+
+  theme(plot.title = element_text(hjust = 0.5))  # Center the title horizontally
+
+plot_NBC <- ggplot(ces2020, aes(x = factor(NBC), fill = factor(voted_for))) +
+  geom_bar(position = "dodge") +
+  labs(title = "NBC", x = "NBC", y = "Count") +
+  scale_fill_manual(values =  c("red", "blue")) +  # Specify colors for Biden and Trump
+  theme_minimal()+
+  theme(plot.title = element_text(hjust = 0.5))  # Center the title horizontally
+
+
+plot_CNN <- ggplot(ces2020, aes(x = factor(CNN), fill = factor(voted_for))) +
+  geom_bar(position = "dodge") +
+  labs(title = "CNN", x = "CNN", y = "Count") +
+  scale_fill_manual(values =  c("red", "blue")) +  # Specify colors for Biden and Trump
+  theme_minimal()+
+  theme(plot.title = element_text(hjust = 0.5))  # Center the title horizontally
+
+plot_Fox_News <- ggplot(ces2020, aes(x = factor(Fox_News), fill = factor(voted_for))) +
+  geom_bar(position = "dodge") +
+  labs(title = "Fox News", x = "Fox News", y = "Count") +
+  scale_fill_manual(values =  c("red", "blue")) +  # Specify colors for Biden and Trump
+  theme_minimal()+
+  theme(plot.title = element_text(hjust = 0.5))  # Center the title horizontally
+
+plot_MSNBC <- ggplot(ces2020, aes(x = factor(MSNBC, levels = c("Yes", "No")), fill = factor(voted_for))) +
+  geom_bar(position = "dodge") +
+  labs(title = "MSNBC", x = "MSNBC", y = "Count") +
+  scale_fill_manual(values =  c("red", "blue")) +  # Specify colors for Biden and Trump
+  theme_minimal()+
+  theme(plot.title = element_text(hjust = 0.5))  # Center the title horizontally
+
+plot_PBS <- ggplot(ces2020, aes(x = factor(PBS, levels = c("Yes", "No")), fill = voted_for)) +
+  geom_bar(position = "dodge") +
+  labs(title = "PBS", x = "PBS", y = "Count") +
+  scale_fill_manual(values =  c("red", "blue")) +  # Specify colors for Biden and Trump
+  theme_minimal()+
+  theme(plot.title = element_text(hjust = 0.5))  # Center the title horizontally
+
+
+
+plot_Other <- ggplot(ces2020, aes(x = factor(Other, levels = c("Yes", "No")), fill = voted_for)) +
+  geom_bar(position = "dodge") +
+  labs(title = "Other", x = "Other", y = "Count") +
+  scale_fill_manual(values = c("blue", "red")) +  # Specify colors for Biden and Trump
+  theme_minimal()+
+  theme(plot.title = element_text(hjust = 0.5))  # Center the title horizontally
+
+legend <- g_legend(plot_PBS + theme(legend.position='bottom'))
+
+grid.arrange(plot_ABC, plot_CBS, plot_NBC, plot_CNN, plot_Fox_News, plot_MSNBC, plot_PBS, plot_Other, legend, nrow = 3)
+
+```
+
+@fig-network depicts the relationship between voters voting preference and media network preference. Because more voters voted for Biden, Biden supporters seem to watch more media network overall. Therefore, I examine the proportions of voters watching a specific network and voting for one of the two candidates. Biden supporters have a higher proportions of watching most networks. Among all the networks that have higher proportions of Biden voters, CNN and MSNBC, two of the most Democratic leaning news networks, have a significantly higher proportions of viewers that are Biden supporters and barely any viewers that support Trump. The only network that is being consumed by Trump supporters are Fox News, a network know to be Republican leaning. 
+
+
 
 ```{r, fig.height = 6.6, fig.width = 10}
 
 # Create individual plots for each news channel
-plot_post <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(post))) +
-  geom_bar(position = "dodge") +
-  labs(title = "Posted", x = "Vote", y = "Count") +
-  theme_minimal() +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  coord_cartesian(ylim = c(0, 4000)) +  
-  guides(fill = FALSE)
-
-plot_comment <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(comment))) +
-  geom_bar(position = "dodge") +
-  labs(title = "Commented", x = "Vote", y = "Count") +
-  theme_minimal() +
-  coord_cartesian(ylim = c(0, 4000)) +  
-  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
- # facet_wrap(~ ., ncol = 4) +
-  guides(fill = FALSE)
-
-plot_read <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(read))) +
-  geom_bar(position = "dodge") +
-  labs(title = "Read", x = "Vote", y = "Count") +
-  theme_minimal() +
-  coord_cartesian(ylim = c(0, 4000)) +
-  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
- # facet_wrap(~ ., ncol = 4) +
-  guides(fill = FALSE)
-
-plot_follow <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(follow))) +
-  geom_bar(position = "dodge") +
-  labs(title = "Followed", x = "Vote", y = "Count") +
-  theme_minimal() +
-  coord_cartesian(ylim = c(0, 4000)) +
-  theme(plot.title = element_text(hjust = 0.5)) +
- # facet_wrap(~ ., ncol = 4) +
-  guides(fill = FALSE)
-
-plot_forward <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(forward))) +
-  geom_bar(position = "dodge") +
-  labs(title = "Forwarded", x = "Vote", y = "Count") +
-  coord_cartesian(ylim = c(0, 4000)) +
-  theme_minimal() +
-  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.title = element_text(hjust = 0.5)) 
-
-
-legend <- g_legend(plot_forward + theme(legend.position='bottom', 
-                                        legend.text = element_text(size = 15, face="bold"), 
-                                        legend.title = element_blank()))
-
-grid.arrange(plot_post, plot_comment, plot_read, plot_follow, plot_forward + theme(legend.position ='none'), legend, nrow = 2)
+# plot_post <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(post))) +
+#   geom_bar(position = "dodge") +
+#   labs(title = "Posted", x = "Vote", y = "Count") +
+#   theme_minimal() +
+#   theme(plot.title = element_text(hjust = 0.5)) +
+#   coord_cartesian(ylim = c(0, 4000)) +  
+#   guides(fill = FALSE)
+# 
+# plot_comment <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(comment))) +
+#   geom_bar(position = "dodge") +
+#   labs(title = "Commented", x = "Vote", y = "Count") +
+#   theme_minimal() +
+#   coord_cartesian(ylim = c(0, 4000)) +  
+#   theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
+#  # facet_wrap(~ ., ncol = 4) +
+#   guides(fill = FALSE)
+# 
+# plot_read <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(read))) +
+#   geom_bar(position = "dodge") +
+#   labs(title = "Read", x = "Vote", y = "Count") +
+#   theme_minimal() +
+#   coord_cartesian(ylim = c(0, 4000)) +
+#   theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
+#  # facet_wrap(~ ., ncol = 4) +
+#   guides(fill = FALSE)
+# 
+# plot_follow <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(follow))) +
+#   geom_bar(position = "dodge") +
+#   labs(title = "Followed", x = "Vote", y = "Count") +
+#   theme_minimal() +
+#   coord_cartesian(ylim = c(0, 4000)) +
+#   theme(plot.title = element_text(hjust = 0.5)) +
+#  # facet_wrap(~ ., ncol = 4) +
+#   guides(fill = FALSE)
+# 
+# plot_forward <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(forward))) +
+#   geom_bar(position = "dodge") +
+#   labs(title = "Forwarded", x = "Vote", y = "Count") +
+#   coord_cartesian(ylim = c(0, 4000)) +
+#   theme_minimal() +
+#   theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.title = element_text(hjust = 0.5)) 
+# 
+# 
+# legend <- g_legend(plot_forward + theme(legend.position='bottom', 
+#                                         legend.text = element_text(size = 15, face="bold"), 
+#                                         legend.title = element_blank()))
+# 
+# grid.arrange(plot_post, plot_comment, plot_read, plot_follow, plot_forward + theme(legend.position ='none'), legend, nrow = 2)
 
 ```
 
 
 ```{r}
 # Create individual plots for each news channel
-plot_post <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(post, levels = c("not_selected", "selected")))) +
-  geom_bar(position = "stack", stat = "count") +
-  labs(title = "Posted", x = "Vote", y = "Count") +
-  theme_minimal() +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  coord_cartesian(ylim = c(0, 6000)) +  
-  guides(fill = FALSE)
-
-plot_comment <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(comment, levels = c("not_selected", "selected")))) +
-  geom_bar(position = "stack", stat = "count") +
-  labs(title = "Commented", x = "Vote", y = "Count") +
-  theme_minimal() +
-  coord_cartesian(ylim = c(0, 6000)) +  
-  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
-  guides(fill = FALSE)
-
-plot_read <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(read, levels = c("not_selected", "selected")))) +
-  geom_bar(position = "stack", stat = "count") +
-  labs(title = "Read", x = "Vote", y = "Count") +
-  theme_minimal() +
-  coord_cartesian(ylim = c(0, 6000)) +
-  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
-  guides(fill = FALSE)
-
-plot_follow <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(follow, levels = c("not_selected", "selected")))) +
-  geom_bar(position = "stack", stat = "count") +
-  labs(title = "Followed", x = "Vote", y = "Count") +
-  theme_minimal() +
-  coord_cartesian(ylim = c(0, 6000)) +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
-  guides(fill = FALSE)
-
-plot_forward <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(forward, levels = c("not_selected", "selected")))) +
-  geom_bar(position = "stack", stat = "count") +
-  labs(title = "Forwarded", x = "Vote", y = "Count") +
-  coord_cartesian(ylim = c(0, 6000)) +
-  theme_minimal() +
-  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.title = element_text(hjust = 0.5)) 
- # facet_wrap(~ ., ncol = 4) +
-
-
-#legend <- g_legend(plot_forward + theme(legend.position='bottom', 
-                                        #legend.text = element_text(size = 15, face="bold"), 
-                                       # legend.title = element_blank())
-
-grid.arrange(plot_post, plot_comment, plot_read, plot_follow, plot_forward + theme(legend.position ='none'), nrow = 1)
+# plot_post <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(post, levels = c("not_selected", "selected")))) +
+#   geom_bar(position = "stack", stat = "count") +
+#   labs(title = "Posted", x = "Vote", y = "Count") +
+#   theme_minimal() +
+#   theme(plot.title = element_text(hjust = 0.5)) +
+#   coord_cartesian(ylim = c(0, 6000)) +  
+#   guides(fill = FALSE)
+# 
+# plot_comment <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(comment, levels = c("not_selected", "selected")))) +
+#   geom_bar(position = "stack", stat = "count") +
+#   labs(title = "Commented", x = "Vote", y = "Count") +
+#   theme_minimal() +
+#   coord_cartesian(ylim = c(0, 6000)) +  
+#   theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
+#   guides(fill = FALSE)
+# 
+# plot_read <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(read, levels = c("not_selected", "selected")))) +
+#   geom_bar(position = "stack", stat = "count") +
+#   labs(title = "Read", x = "Vote", y = "Count") +
+#   theme_minimal() +
+#   coord_cartesian(ylim = c(0, 6000)) +
+#   theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
+#   guides(fill = FALSE)
+# 
+# plot_follow <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(follow, levels = c("not_selected", "selected")))) +
+#   geom_bar(position = "stack", stat = "count") +
+#   labs(title = "Followed", x = "Vote", y = "Count") +
+#   theme_minimal() +
+#   coord_cartesian(ylim = c(0, 6000)) +
+#   theme(plot.title = element_text(hjust = 0.5)) +
+#   theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
+#   guides(fill = FALSE)
+# 
+# plot_forward <- ggplot(ces2020, aes(x = factor(voted_for), fill = factor(forward, levels = c("not_selected", "selected")))) +
+#   geom_bar(position = "stack", stat = "count") +
+#   labs(title = "Forwarded", x = "Vote", y = "Count") +
+#   coord_cartesian(ylim = c(0, 6000)) +
+#   theme_minimal() +
+#   theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), plot.title = element_text(hjust = 0.5)) 
+#  # facet_wrap(~ ., ncol = 4) +
+# 
+# 
+# #legend <- g_legend(plot_forward + theme(legend.position='bottom', 
+#                                         #legend.text = element_text(size = 15, face="bold"), 
+#                                        # legend.title = element_blank())
+# 
+# grid.arrange(plot_post, plot_comment, plot_read, plot_follow, plot_forward + theme(legend.position ='none'), nrow = 1)
 
 ```
+
+
+
 ```{r}
+#| label: fig-party
+#| fig-cap: Relationship between TV News Consumption and Voting Behaviour by Party
+#| echo: false
+#| warning: false
+#| message: false
+
+
+ggplot(ces2020, aes(x = voted_for, fill = voted_for)) +
+  geom_bar() +
+  facet_wrap(facets = vars(Party)) +
+  labs(title = "Relationship Between Party Affiliation and Voting Behaviour",
+       x = "Vote",
+       y = "Count",
+       color = "Voted for Biden (1) or Trump (0)") +
+  scale_fill_brewer(palette = "Set1")
+
+```
+@fig-party reports on the voting behaviours of voters from different parties. Democrat voters mostly voted for Biden, and Republicans for Trump unexpectely. The voting outcomes for Independent and Other voters are mostly even, with Biden collecting slightly more votes from the Independent voters. 
+
+
+```{r}
+#| label: fig-foxnews
+#| fig-cap: Relationship between Fox News Consumption and Voting Behaviour by Party
+#| echo: false
+#| warning: false
+#| message: false
+
 # Change labels for Fox_News variable
-ces2020$Fox_News <- factor(ces2020$Fox_News, labels = c("No", "Yes"))
+#ces2020$Fox_News <- factor(ces2020$Fox_News, labels = c("No", "Yes"))
 
 ggplot(ces2020, aes(x = Fox_News, fill = voted_for)) +
   geom_bar() +
   facet_wrap(facets = vars(Party)) +
-  labs(title = "Relationship Between Fox News Consumption and Voting Behavior",
+  labs(title = "Relationship between Fox News Consumption and Voting Behavior by Party",
        x = "Fox News",
        y = "Count",
        color = "Voted for Biden (1) or Trump (0)") +
   scale_fill_brewer(palette = "Set1")
- # scale_color_manual(values = c("red", "blue")) +  # Customize colors for better visibility
-  theme_minimal()
 ```
+@fig-foxnews and @fig-cnn take Fox News and CNN consumption into detail since they are the representation of Republican and Democratic network respectively. These two figures add in the respondents' party affiliation and examine if there is any differences in news consumption across different parties and their relationship with voting bahaviour. 
+
+For @fig-foxnews, almost all Democrat identifying respondents voted for Biden and the majority of them do not watch Fox News. Conversely, most Republicans voted for Trump and a high proportions of them watch Fox News. However, notably there are more Republicans who did not watch Fox News choosing to vote for Biden instead compared to their Democrat counterparts. The relationship becomes interesting when the respondents identify either as "Independent" or "Other." It appears that independent voters who watch Fox News have a higher likelihood of voting for Trump while those who do not are more likely to vote for Biden. "Other" portrays the same relationship. 
+
 ```{r}
+#| label: fig-cnn
+#| fig-cap: Relationship between CNN Consumption and Voting Behaviour by Party
+#| echo: false
+#| warning: false
+#| message: false
+
 # Change labels for Fox_News variable
-ces2020$CNN <- factor(ces2020$CNN, labels = c("No", "Yes"))
 
 ggplot(ces2020, aes(x = CNN, fill = voted_for)) +
   geom_bar() +
   facet_wrap(facets = vars(Party)) +
-  labs(title = "Relationship Between CNN Consumption and Voting Behavior",
+  labs(title = "Relationship between CNN Consumption and Voting Behaviour by Party",
        x = "CNN",
        y = "Count",
        color = "Voted for Biden (1) or Trump (0)") +
   scale_fill_brewer(palette = "Set1")
- # scale_color_manual(values = c("red", "blue")) +  # Customize colors for better visibility
-  theme_minimal()
 ```
 
 
+@fig-cnn portrays nearly the same results as its Fox News counterpart. While most Democrat voters voted for Biden, the ones who do not watch CNN have a slightly higher chance of voting for Trump than the ones who do. Republicans who watch CNN also are more likely to vote for Biden compared to their counterparts that don't. The notable impact of network on Independent and Other voters is apparent as well. Independent voters who watch CNN are much more likely to vote for Biden while the ones that don't have a higher likelihood of voting for Trump. Others portray the same relationship. Because without the influence of media networks, the voting outcome for Indepdent and Other voters are almost evenly distributed between Biden and Trump, the results from the @fig-fox and @fig-cnn confirm the influence of media network on its viewers, and specifically its strong impact on viewers who neither are affiliated with the Democratic nor Republican party. The political opinions of viewers who do not have a strong party affiliation could be easily influenced by their news consumption.
+
+
 ```{r}
+#| label: fig-tv
+#| fig-cap: Relationship between TV News Consumption and Voting Behaviour by Party
+#| echo: false
+#| warning: false
+#| message: false
+
 ces2020$TV_type <- factor(ces2020$TV_type, labels = c("National & Local", "National"))
 
 scatter_plot <- ggplot(ces2020, aes(x = TV_type, fill = voted_for)) +
   geom_bar() +
   facet_wrap(facets = vars(Party)) +
-  labs(title = "Relationship Between TV News Consumption and Voting Behavior",
+  labs(title = "Relationship Between TV News Consumption and Voting Behaviour by Party",
        x = "TV Type",
        y = "Count",
        color = "Voted for Biden (1) or Trump (0)") +
@@ -348,8 +626,9 @@ scatter_plot
 
 ```
 
-Our results are summarized in @tbl-modelresults.
+The relationship between voters' TV news consumption and their political and voting preferences are depicted in @fig-tv. Unlike the apparent influence of specific networks, different TV consumption seem to have no significant influence on voters voting behaviour. Democrat voters generally voted for Biden regardless if they choose to only watch national newscast or watch both national and local newscast, the same for Republicans. For Independent and other voters, there is generally a even number of people who voted for Biden or Trump across the two groups of people that watch different newscast. 
 
+## Model Results
 ```{r}
 #| echo: false
 #| eval: true
@@ -377,6 +656,15 @@ modelsummary(
   )
 ```
 
+The results, summarized in @tbl-modelresults1, generally matches our expectation. To avoid multicollinearity, the model excluded the category "Both" from `TV_type` and "Party Democrat" from `Party.`The intercept represents the estimated log-odds of supporting Biden when all other predictors are held constant at their reference levels. In this case, the estimated log-odds of supporting Biden for individuals who do not watch any of these news networks, watches both national and local newscasts, and identify as a Democrat is 3.63.
+
+@fig-modelresults1 (see @sec-credibility-interval) shows range of coefficient estimates of our model within the 90% probability. The estimates are statistically significant if the intervals do not cross 0. The value for the estimates are in log-odds, indicating that if the coefficient is positive, the individual supports Biden, if negative, the individual supports Trump.
+
+Neutral networks (ABC, CBS, and NBC) only have a slight positive relationship with voting for Biden, and their results are all statistically insignificant as shown in @fig-modelresults1. Watching CNN is significantly positively correlated with voting for Biden; compared to the reference group, voter watching CNN on average increases the log-odds of them voting for Biden by 1.631 units. MSNBC also exhibits similar relationship, while PBS shows a slightly smaller but still positive relationship. 
+
+While only watching national newscast does decreases the likelihood of voting for Biden on a small scale compared to the reference group, there is no statistically significant relationship between the two. Lastly, as expected, identifying as part of the Republican party substantially decreases the possibility of voting for Biden (estimated coefficient of -5.484). Identifying as Independent or Other voters have no statistically significant influence on voting behaviours. 
+
+
 
 ```{r}
 # Load necessary libraries
@@ -389,21 +677,6 @@ vif(political_preferences)
 summary(political_preferences)
 
 ```
-
-
-
-
-
-```{r}
-#| echo: false
-#| eval: true
-#| label: tbl-modelresults
-#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
-#| warning: false
-
-
-```
-
 
 
 
@@ -499,7 +772,7 @@ pp_check(political_preferences) +
 #| message: false
 
 #### Read data ####
-analysis_data1 <- read_parquet(here::here("data/analysis_data/cleaned_ces2020.parquet"))
+# analysis_data1 <- read_parquet(here::here("data/analysis_data/cleaned_ces2020.parquet"))
 
 # Convert variables to factors
 #analysis_data$race <- factor(analysis_data$race)
@@ -507,21 +780,21 @@ analysis_data1 <- read_parquet(here::here("data/analysis_data/cleaned_ces2020.pa
 #analysis_data$employ <- factor(analysis_data$employ)
 
 # Create voted_for variable in binary form
-analysis_data1$voted_for_binary <- ifelse(analysis_data1$voted_for == "Biden", 1, 0)
-
-# Model 1 for n = 1000
-set.seed(853)
-
-ces2020_reduced <- 
-  analysis_data1 |> 
-  slice_sample(n = 2500)
-
-posterior_vs_prior(political_preferences, size = 0.3) +
-  theme_minimal() +
-  theme(legend.position = "bottom") +
-  theme(axis.text.x=element_text(hjust=1, vjust=0.5),
-        text=element_text(size=8)) +
-  coord_flip()
+# analysis_data1$voted_for_binary <- ifelse(analysis_data1$voted_for == "Biden", 1, 0)
+# 
+# # Model 1 for n = 1000
+# set.seed(853)
+# 
+# ces2020_reduced <- 
+#   analysis_data1 |> 
+#   slice_sample(n = 2500)
+# 
+# posterior_vs_prior(political_preferences, size = 0.3) +
+#   theme_minimal() +
+#   theme(legend.position = "bottom") +
+#   theme(axis.text.x=element_text(hjust=1, vjust=0.5),
+#         text=element_text(size=8)) +
+#   coord_flip()
 ```
 
 ```{r}

@@ -80,7 +80,13 @@ cleaned_ces2020 <-
 #### Save data ####
 write_parquet(cleaned_ces2020, "data/analysis_data/cleaned_ces2020.parquet")
 
+head2020 <- head(cleaned_ces2020, 100)
 
+write_csv(head2020, "data/analysis_data/head2020.csv")
+
+
+row_count <- nrow(cleaned_ces2020)
+print(row_count)
 
 
 

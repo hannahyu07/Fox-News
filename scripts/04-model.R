@@ -63,6 +63,10 @@ saveRDS(
 )
 
 
+head2020 <- head(ces2020_reduced, 100)
+
+write_csv(head2020, "data/analysis_data/head2020.csv")
+
 #test_file("scripts/05-test_class.R")
 #test_file("scripts/06-test_observations.R")
 #test_file("scripts/07-test_coefficients.R")
