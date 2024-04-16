@@ -33,7 +33,7 @@ analysis_data1$Party <- factor(analysis_data1$Party)
 # Create voted_for variable in binary form
 analysis_data1$voted_for_binary <- ifelse(analysis_data1$voted_for == "Biden", 1, 0)
 
-# Model  for n = 2000
+# Model  for n = 2500
 set.seed(853)
 
 ces2020_reduced <- 
@@ -63,20 +63,10 @@ saveRDS(
 )
 
 
-head2020 <- head(ces2020_reduced, 100)
+test_file("scripts/05-test_class.R")
+test_file("scripts/06-test_observations.R")
+test_file("scripts/07-test_coefficients.R")
 
-write_csv(head2020, "data/analysis_data/head2020.csv")
-
-#test_file("scripts/05-test_class.R")
-#test_file("scripts/06-test_observations.R")
-#test_file("scripts/07-test_coefficients.R")
-
-
-
-# Print unique values of tv_news24 and newspaper24 in the sliced sample
-print(unique(ces2020_reduced$TV_type))
-print(unique(ces2020_reduced$Newspaper_type))
-print(unique(analysis_data1$TV_type))
 
 
 
