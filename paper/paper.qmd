@@ -3,11 +3,12 @@ title: "Media Matters/The Battle between Fake News and Fox News"
 subtitle: "Exploring the Influence of Media Preferences on Voting Behavior in the 2020 U.S. Presidential Election Among Voters from Different Parties"
 author: 
   - Hannah Yu
-thanks: "Code and data are available at: LINK."
+thanks: "Code and data are available at: https://github.com/hannahyu07/Fox-News"
 date: today
 date-format: long
 abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
 format: pdf
+toc: true
 number-sections: true
 bibliography: references.bib
 ---
@@ -94,7 +95,7 @@ The division of media was exacerbated by Trump's animosity against liberal netwo
 
 To explore and answer these questions, this paper analyzes the influence of watching specific media on voters' voting behavior. It uses the 2020 US election data from the Cooperative Election Study (CES), which surveys Americans before and after elections. From the dataset, information on voters' media preferences on America's most prominent networks, including ABC, CNN, Fox News, etc., was gathered. Then, a Bayesian logistic regression model was employed to estimate the election outcome between Trump and Biden based on voters' media preferences and their original party affiliation. The estimand of this paper is the actual number of people who supported Trump or Biden during the 2020 election. However, due to the difficulty of collecting data on millions of voters, this paper estimates the estimand using the logistic regression model trained using a sample from the CES dataset. The findings indicate that watching media networks with specific political ideologies is associated with higher chances of voting for the candidate they prefer. Among all networks, this relationship is most apparent in CNN and Fox News, exerting heavy influence on voters who classify as "Independent" or "Other." Additionally, this paper also studies the influence of watching national newscasts on voting outcomes compared to watching both national and local newscasts, finding no significant differences between the outcomes of the two.
 
-The remainder of this paper is structured as follows: @sec-data demonstrates the data used for this paper, @sec-model builds the model and discusses its justification and explanation, @sec-result highlights the results of the predictions using tables and graphs, and @sec-discussion contains discussions conducted based on the findings. These discussions address the voting prediction results based on TV types, party affiliation, and media influence, and discuss policy implications from the study.
+The remainder of this paper is structured as follows: @sec-data demonstrates the data used for this paper, @sec-model builds the model and discusses its justification and explanation, @sec-results highlights the results of the predictions using tables and graphs, and @sec-discussion contains discussions conducted based on the findings. These discussions address the voting prediction results based on TV types, party affiliation, and media influence, and discuss policy implications from the study.
 
 
 # Data {#sec-data}
@@ -196,20 +197,30 @@ Party Affiliation:
 #| echo: false
 #| warning: false
 
-summary <- 
-  ces2020 |>
-  summary() |>
-  kable() 
 
-# Convert the summary to a data frame
-summary_df <- as.data.frame(summary)
-
-# Print the summary using pander
-pander(summary_df, style = "grid", split.tables = Inf)
-
+ces2020 %>%
+  select(1:6) %>%
+  summary() %>%
+  kable() %>%
+  kable_styling(position = "left", bootstrap_options = "condensed", full_width = FALSE)
 
 
 ```
+```{r}
+#| message: false
+#| echo: false
+#| warning: false
+
+
+ces2020 %>%
+  select(7:11) %>%
+  summary() %>%
+  kable() %>%
+  kable_styling(position = "left", bootstrap_options = "condensed", full_width = FALSE)
+
+
+```
+
 @tbl-summary presents a summary of the cleaned data, showing detailed statistics about the dataset. It is evident that Biden has more supporters in this election. The seven listed media networks capture the majority of networks people watch; while `Other` captures the rest. Due to the conflict of "Local Newscast" with the variables for media use networks, the number of respondents that only watch local newscast becomes 0 after cleaning. If the respondent only watches local newscasts, then they would skip all the questions related to national newscasts (e.g. Do you watch ABC?) since these questions are not applicable. With no further media-related information for voters who only watch local newscasts, this value is excluded from later examinations and modelling. There are more respondents identifying as Democrats than any other party. There are almost equal amount of Republicans and Independent voters, and only 534 voters identified as "Other."
 
 ## Data Measurement
@@ -226,7 +237,7 @@ People's media use networks are represented by if  `ABC`, `CBS`, `NBC`, `CNN`, `
 The variable `Party` categorizes respondents into four categories. "Democrat" means the voter identifies as a Democrat; "Republican" if the voter identifies themselves as a Republican. However, in this dataset, "Independent" is not affiliated with the American Independent Party; independent here means the voter has no party affiliation. Lastly, "Other" symbolizes the voter being part of a party that is neither Democratic nor Republican. Only having four categories might overlook the nuanced and diverse political beliefs held by individuals. Some may have hybrid or unconventional political views that don't fit neatly into these categories. Therefore, their categorization might not accurately describe their party affiliations. 
 
 
-# Model {@sec-model}
+# Model {#sec-model}
 
 The goal of our modelling strategy is twofold. Firstly,...
 
@@ -273,7 +284,7 @@ As most news and media outlets are more liberal-leaning, I expect a slightly hig
 In terms of the relationship between party affiliation and voting choices, it's reasonable to expect that the majority of Democrat voters would support their candidate, Biden, while a significant portion of Republican voters would favour Trump. This expectation is based on historical voting patterns and the ideological alignment between these parties and their respective candidates. However, it's less predictable how Independent and Other voters might vote, as they have not explicitly expressed their preferences between the two main candidates. Therefore, I anticipate an equal split of votes between Biden and Trump for these two groups. 
 
 
-# Results {@sec-results}
+# Results {#sec-results}
 
 ## Data Results
 ```{r}
@@ -454,9 +465,7 @@ ces2020$TV_type <- factor(ces2020$TV_type, labels = c("National & Local", "Natio
         y = "Count",
         color = "Voted for Biden (1) or Trump (0)"
       ) +
-      scale_fill_brewer(palette = "Set1") +
-      theme_minimal()
-  )
+      scale_fill_brewer(palette = "Set1")   )
 }
 
 ```
