@@ -1,6 +1,8 @@
-# Starter folder
+# Media Matters/The Battle between Fake News and Fox News: Exploring the Influence of Media Preferences on Voting Behavior in the 2020 U.S. Presidential Election Among Voters from Different Parties
 
 ## Overview
+Hi my reviewer! I would appreciate if you help me pick a better title between "Media Matters" or "the battle between fake news and Fox News". Unfortunately due to exams, my paper hasn't been fully done yet. Therefore, my discussion and appendix section are still messy and need a lot of fixes. In addition, I wonder if you could give some tips on the enhancement part. I've been so busy and hasn't gotten time to go over what should I do about that. 
+
 
 This repo provides students with a foundation for their own projects associated with *Telling Stories with Data*. You do not need every aspect for every paper and you should delete aspects that you do not need.
 
