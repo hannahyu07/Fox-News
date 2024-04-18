@@ -5,7 +5,6 @@
 # Contact: realhannah.yu@mail.utoronto.ca
 # License: MIT
 # Pre-requisites: 01-download_data.R
-# Any other information needed? 
 
 #### Workspace setup ####
 library(tidyverse)
