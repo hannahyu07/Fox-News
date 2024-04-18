@@ -1,6 +1,6 @@
 ---
 title: "Datasheet for 2020 Cooperative Election Study"
-subtitle: "The survey dataset used for 'The Battle between 'Fake News' and Fox News'"
+subtitle: "The survey dataset used for 'Fake News vs Fox News'"
 author: 
   - Hannah Yu
 thanks: "Code and data are available at: https://github.com/hannahyu07/Fox-News"

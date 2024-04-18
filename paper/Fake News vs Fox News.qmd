@@ -1,5 +1,5 @@
 ---
-title: "The Battle between 'Fake News' and Fox News"
+title: "Fake News vs Fox News"
 subtitle: "Exploring the Influence of Media Preferences on Voting Behavior in the 2020 U.S. Presidential Election Among Voters from Different Parties"
 author: 
   - Hannah Yu
@@ -32,7 +32,7 @@ library(testthat)
 library(kableExtra)
 library(arrow)
 library(gridExtra)
-#library(pander)
+library(dataverse)
 #library(cowplot)
 #library(lemon)
 ```
@@ -99,7 +99,7 @@ The remainder of this paper is structured as follows: @sec-data demonstrates the
 
 # Data {#sec-data}
 
-Data analysis is performed using statistical programming language R [@citeR], with packages `tidyverse` [@citeTidyverse], `here` [@citeHere], `rstanarm` [@citeRstanarm], `modelsummary` [@citeModleSummary], `ggplot2` [@citeGgplot2], `knitr` [@citeKnitr], `marginaleffects` [@citeMarginalEffects], `plotly` [@citePlotly], `tibble` [@citeTibble], `margins` [@citeMargins], `testthat` [@citetestthat], `kableExtra` [@citeKableExtra], `arrow` [@citeArrow], `gridExtra` [@citeGridExtra], and `pander` [@citePander].
+Data analysis is performed using statistical programming language R [@citeR], with packages `tidyverse` [@citeTidyverse], `here` [@citeHere], `rstanarm` [@citeRstanarm], `modelsummary` [@citeModleSummary], `ggplot2` [@citeGgplot2], `knitr` [@citeKnitr], `marginaleffects` [@citeMarginalEffects], `plotly` [@citePlotly], `tibble` [@citeTibble], `margins` [@citeMargins], `testthat` [@citetestthat], `kableExtra` [@citeKableExtra], `arrow` [@citeArrow], `gridExtra` [@citeGridExtra], and `dataverse` [@citeDataverse].
 
 ## Data Source
 
@@ -379,7 +379,7 @@ grid.arrange(plot_ABC, plot_CBS, plot_NBC, plot_CNN, plot_Fox_News, plot_MSNBC, 
 
 ```{r}
 #| label: fig-party
-#| fig-cap: Relationship between TV News Consumption and Voting Behaviour by Party
+#| fig-cap: Relationship between Party Affiliation and Voting Behaviour 
 #| echo: false
 #| warning: false
 #| message: false
@@ -442,7 +442,7 @@ For @fig-foxnews, almost all Democrat-identifying respondents voted for Biden an
 ```
 
 
-@fig-cnn portrays nearly the same results as its Fox News counterpart. While most Democrat voters voted for Biden, the ones who do not watch CNN have a slightly higher chance of voting for Trump than the ones who do. Republicans who watch CNN also are more likely to vote for Biden compared to their counterparts who don't. The notable impact of the network on Independent and Other voters is apparent as well. Independent voters who watch CNN are much more likely to vote for Biden while the ones that don't have a higher likelihood of voting for Trump. Others portray the same relationship. Because without the influence of media networks, the voting outcome for independent and Other voters are almost evenly distributed between Biden and Trump, the results from the @fig-fox and @fig-cnn confirm the influence of media networks on its viewers, and specifically its strong impact on viewers who neither are affiliated with the Democratic nor Republican party. The political opinions of viewers who do not have a strong party affiliation could be easily influenced by their news consumption.
+@fig-cnn portrays nearly the same results as its Fox News counterpart. While most Democrat voters voted for Biden, the ones who do not watch CNN have a slightly higher chance of voting for Trump than the ones who do. Republicans who watch CNN also are more likely to vote for Biden compared to their counterparts who don't. The notable impact of the network on Independent and Other voters is apparent as well. Independent voters who watch CNN are much more likely to vote for Biden while the ones that don't have a higher likelihood of voting for Trump. Others portray the same relationship. Because without the influence of media networks, the voting outcome for independent and Other voters are almost evenly distributed between Biden and Trump, the results from the @fig-foxnews and @fig-cnn confirm the influence of media networks on its viewers, and specifically its strong impact on viewers who neither are affiliated with the Democratic nor Republican party. The political opinions of viewers who do not have a strong party affiliation could be easily influenced by their news consumption.
 ```{r}
 #| label: fig-tv
 #| fig-cap: Relationship between TV News Consumption and Voting Behaviour by Party
@@ -469,28 +469,6 @@ ces2020$TV_type <- factor(ces2020$TV_type, labels = c("National & Local", "Natio
 ```
 
 
-```{r}
-# #| label: fig-tv
-# #| fig-cap: Relationship between TV News Consumption and Voting Behaviour by Party
-# #| echo: false
-# #| warning: false
-# #| message: false
-# 
-# ces2020$TV_type <- factor(ces2020$TV_type, labels = c("National & Local", "National"))
-# # 
-# ggplot(ces2020, aes(x = TV_type, fill = voted_for)) +
-#   geom_bar() +
-#   facet_wrap(facets = vars(Party)) +
-#   labs(title = "Relationship Between TV News Consumption and Voting Behaviour by Party",
-#        x = "TV Type",
-#        y = "Count",
-#        color = "Voted for Biden (1) or Trump (0)") +
-#   scale_fill_brewer(palette = "Set1")
-#  # scale_color_manual(values = c("red", "blue")) +  # Customize colors for better visibility
-#   theme_minimal()
-
-
-```
 
 The relationship between voters' TV news consumption and their political and voting preferences is depicted in @fig-tv. Unlike the apparent influence of specific networks, different TV consumption seems to have no significant influence on voters' voting behaviour. Democrat voters generally voted for Biden regardless if they chose to only watch national newscasts or watch both national and local newscasts, the same for Republicans. For Independent and other voters, there is generally an even number of people who voted for Biden or Trump across the two groups of people that watch different newscasts. 
 
@@ -522,7 +500,7 @@ modelsummary(
   )
 ```
 
-The results, summarized in @tbl-modelresults1, generally match our expectations. To avoid multicollinearity, the model excluded the category "Both" from `TV_type` and "Party Democrat" from `Party.`The intercept represents the estimated log odds of supporting Biden when all other predictors are held constant at their reference levels. In this case, the estimated log-odds of supporting Biden for individuals who do not watch any of these news networks watch both national and local newscasts and identify as a Democrat is 3.63.
+The results, summarized in @tbl-modelresults, generally match our expectations. To avoid multicollinearity, the model excluded the category "Both" from `TV_type` and "Party Democrat" from `Party.`The intercept represents the estimated log odds of supporting Biden when all other predictors are held constant at their reference levels. In this case, the estimated log-odds of supporting Biden for individuals who do not watch any of these news networks watch both national and local newscasts and identify as a Democrat is 3.63.
 
 @fig-modelresults1 (see @sec-credibility-interval) shows the range of coefficient estimates of our model within the 90% probability. The estimates are statistically significant if the intervals do not cross 0. The values for the estimates are in log-odds, indicating that if the coefficient is positive, the individual supports Biden, if negative, the individual supports Trump.
 
@@ -578,57 +556,9 @@ In order to resolve endogeneity concerns, methods such as instrumental variables
 # Appendix {-}
 
 
-# Additional data details
-
 # Model details {#sec-model-details}
 
 ## Posterior predictive check
-
-In @fig-ppcheckandposteriorvsprior-1 we implement a posterior predictive check. This shows...
-
-In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. This shows... 
-
-```{r}
-#| eval: true
-#| echo: false
-#| message: false
-#| warning: false
-#| label: fig-ppcheckandposteriorvsprior
-#| layout-ncol: 2
-#| fig-cap: "Examining how the model fits, and is affected by, the data"
-#| fig-subcap: ["Posterior prediction check", "Comparing the posterior with the prior"]
-
-#pp_check(first_model) +
- # theme_classic() +
- # theme(legend.position = "bottom")
-
-#posterior_vs_prior(first_model) +
-  #theme_minimal() +
- # scale_color_brewer(palette = "Set1") +
- # theme(legend.position = "bottom") +
- # coord_flip()
-```
-
-## Diagnostics
-
-@fig-stanareyouokay-1 is a trace plot. It shows... This suggests...
-
-@fig-stanareyouokay-2 is a Rhat plot. It shows... This suggests...
-
-```{r}
-#| echo: false
-#| eval: true
-#| message: false
-#| warning: false
-#| label: fig-stanareyouokay
-#| fig-cap: "Checking the convergence of the MCMC algorithm"
-#| fig-subcap: ["Trace plot", "Rhat plot"]
-#| layout-ncol: 2
-
-#plot(first_model, "trace")
-
-#plot(first_model, "rhat")
-```
 
 ```{r}
 #| label: fig-post_dist
@@ -640,6 +570,8 @@ In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. Th
 pp_check(political_preferences) +
   theme(legend.position = "bottom")
 ```
+In @fig-post_dist, a posterior distribution is implemented. This compares who people voted for in reality with the prediction results from the posterior distribution from the logistic regression model. This posterior distribution fitting perfectly with the actual data suggests that the my logistic model is a good representation of the actual voting preferences in the 2020 election data.
+
 
 ```{r}
 #| label: fig-post_prior
@@ -648,31 +580,29 @@ pp_check(political_preferences) +
 #| warning: false
 #| message: false
 
-#### Read data ####
-# analysis_data1 <- read_parquet(here::here("data/analysis_data/cleaned_ces2020.parquet"))
 
-# Convert variables to factors
-#analysis_data$race <- factor(analysis_data$race)
-#analysis_data$region <- factor(analysis_data$region)
-#analysis_data$employ <- factor(analysis_data$employ)
+analysis_data <- read_parquet(here::here("data/analysis_data/cleaned_ces2020.parquet"))
 
 # Create voted_for variable in binary form
-# analysis_data1$voted_for_binary <- ifelse(analysis_data1$voted_for == "Biden", 1, 0)
-# 
-# # Model 1 for n = 1000
-# set.seed(853)
-# 
-# ces2020_reduced <- 
-#   analysis_data1 |> 
-#   slice_sample(n = 2500)
-# 
-# posterior_vs_prior(political_preferences, size = 0.3) +
-#   theme_minimal() +
-#   theme(legend.position = "bottom") +
-#   theme(axis.text.x=element_text(hjust=1, vjust=0.5),
-#         text=element_text(size=8)) +
-#   coord_flip()
+analysis_data$voted_for_binary <- ifelse(analysis_data$voted_for == "Biden", 1, 0)
+
+set.seed(853)
+
+ces2020_reduced <- 
+  analysis_data |> 
+  slice_sample(n = 2500)
+
+posterior_vs_prior(political_preferences, size = 0.3) +
+   theme_minimal() +
+   theme(legend.position = "bottom") +
+   theme(axis.text.x=element_text(hjust=1, vjust=0.5),
+         text=element_text(size=8)) +
+   coord_flip()
 ```
+@fig-post_prior compares the prior distribution of parameters with the posterior distribution of parameters in my logistic regression model. The majority of the model parameters do not vary much even after data are taken into account. This shows that the observed data matches with the initial belief and expectation about the voting preferences for 2020 presidential election. 
+
+
+## Markov chain Monte Carlo Convergence Check
 
 ```{r}
 #| echo: false
@@ -680,13 +610,11 @@ pp_check(political_preferences) +
 #| message: false
 #| warning: false
 #| label: fig-trace1
-#| fig-cap: "Trace plot of intercept and race"
-#| fig-subcap: ["Trace plot of Intercept", "Trace plot of race White", "Trace plot of race Black", "Trace plot of race Hispanic", "Trace plot of race Middle Eastern", "Trace plot of race Native American", "Trace plot of race Two or more races", "Trace plot of race Other"]
-#| layout-ncol: 2
+#| fig-cap: "Trace plot of Intercept and Media Type"
+#| fig-subcap: ["Trace plot of Intercept", "Trace plot of ABC Yes", "Trace plot of CBS Yes", "Trace plot of race NBC Yes", "Trace plot of race CNN Yes", "Trace plot of Fox_News Yes", "Trace plot of MSNBC Yes", "Trace plot of PBS Yes", "Trace plot of Other Yes"]
+#| layout-ncol: 3
 
-#plot(political_preferences1, "trace")
 plot(political_preferences, "trace", "(Intercept)")
-
 plot(political_preferences, "trace", "ABCYes")
 plot(political_preferences, "trace", "CBSYes")
 plot(political_preferences, "trace", "NBCYes")
@@ -704,11 +632,12 @@ plot(political_preferences, "trace", "OtherYes")
 #| message: false
 #| warning: false
 #| label: fig-trace2
-#| fig-cap: "Trace plot of region"
-#| fig-subcap: ["Trace plot of region Northeast", "Trace plot of region South", "Trace plot of region West"]
+#| fig-cap: "Trace plot of TV Type"
+#| fig-subcap: ["Trace plot of TV_type National Newscast"]
 #| layout-ncol: 2
 
 plot(political_preferences, "trace", "TV_typeNational Newscast")
+
 ```
 
 
@@ -718,8 +647,8 @@ plot(political_preferences, "trace", "TV_typeNational Newscast")
 #| message: false
 #| warning: false
 #| label: fig-trace3
-#| fig-cap: "Trace plot of region"
-#| fig-subcap: ["Trace plot of region Northeast", "Trace plot of region South", "Trace plot of region West"]
+#| fig-cap: "Trace plot of Party"
+#| fig-subcap: ["Trace plot of Party Independent", "Trace plot of Party Other", "Trace plot of Party Republican"]
 #| layout-ncol: 2
 
 plot(political_preferences, "trace", "PartyIndependent")
@@ -739,6 +668,9 @@ plot(political_preferences, "rhat")
 ```
 
  
+@fig-trace1, @fig-trace2, @fig-trace3 are the trace plot of the model. The lines are horizontal and oscillating, and have overlaps between the chains, suggesting no existing signs of issues with the model.
+
+@fig-rhat is the Rhat plot of the model. It compares the variability within each chain to the variability between chains in MCMC. In ideal condition, the Rhat should be close to 1, indicating that the chains have converged to the same distribution. This Rhat plot is indeed close to 1, suggesting that the MCMC algorithm has reached convergence for the model. 
 
 ## Credibility Interval {#sec-credibility-interval}
 @fig-modelresults1 shows the 90% credibility interval for the model.
@@ -755,6 +687,7 @@ modelplot(political_preferences, conf_level = 0.90, size = 0.2) +
   labs(x = "90% credibility interval")
 ```
 \newpage
+
 
 
 # References

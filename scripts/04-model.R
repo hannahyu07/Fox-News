@@ -26,7 +26,6 @@ analysis_data1$MSNBC <- factor(analysis_data1$MSNBC)
 analysis_data1$PBS <- factor(analysis_data1$PBS)
 analysis_data1$Other <- factor(analysis_data1$Other)
 analysis_data1$TV_type <- factor(analysis_data1$TV_type)
-#analysis_data1$Newspaper_type <- factor(analysis_data1$Newspaper_type)
 analysis_data1$Party <- factor(analysis_data1$Party)
 
 
@@ -39,7 +38,6 @@ set.seed(853)
 ces2020_reduced <- 
   analysis_data1 |> 
   slice_sample(n = 2500)
-print(unique(ces2020_reduced$TV_type))
 
 write.csv(ces2020_reduced, file = "reduced_ces2020.csv")
 
