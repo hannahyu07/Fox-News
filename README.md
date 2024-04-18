@@ -1,4 +1,4 @@
-# "Fake News" vs Fox News: Exploring the Influence of Media Preferences on Voting Behavior in the 2020 U.S. Presidential Election Among Voters from Different Parties
+# "Fake News" vs Fox News: The Influence of Media Preferences on Voting Behavior in the 2020 U.S. Presidential Election Among Voters from Different Parties
 
 ## Overview
 
