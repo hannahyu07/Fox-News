@@ -1,12 +1,12 @@
 ---
-title: "Media Matters/The Battle between Fake News and Fox News"
+title: "The Battle between 'Fake News' and Fox News"
 subtitle: "Exploring the Influence of Media Preferences on Voting Behavior in the 2020 U.S. Presidential Election Among Voters from Different Parties"
 author: 
   - Hannah Yu
 thanks: "Code and data are available at: https://github.com/hannahyu07/Fox-News"
 date: today
 date-format: long
-abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
+abstract: "This study examines the impact of media consumption on voting behavior in the 2020 U.S. presidential election with data from the Cooperative Election Study (CES 2020). Using logistic regression, I analyze the relationship between watching specific media networks and voting for either Trump or Biden among individuals with varying political affiliations. The analysis shows that viewing political leaning networks have a significant impact on voting preferences among Democrats, Republicans, and Independents, with CNN viewers more likely to support Biden and Fox News viewers favoring Trump. The findings that among voters from all parties, Independent voters' supports are heavily determined by their preferred media emphasize media's role in shaping electoral outcomes and the importance of promoting media literacy and addressing challenges created by media polarization"
 format: pdf
 toc: true
 number-sections: true
@@ -32,8 +32,7 @@ library(testthat)
 library(kableExtra)
 library(arrow)
 library(gridExtra)
-library(pander)
-
+#library(pander)
 #library(cowplot)
 #library(lemon)
 ```
@@ -239,7 +238,6 @@ The variable `Party` categorizes respondents into four categories. "Democrat" me
 
 # Model {#sec-model}
 
-The goal of our modelling strategy is twofold. Firstly,...
 
 Here we briefly describe the Bayesian analysis model used to investigate... Background details and diagnostics are included in [Appendix - @sec-model-details].
 
@@ -550,34 +548,27 @@ From both the data and modelling results, it is noticeable that Independent vote
 
 ## Media Influence on Voting Behavior 
 
-The analysis reveals a clear correlation between media preferences and voting decisions. Viewers of left-leaning networks like CNN and MSNBC are more likely to vote for Biden, while those who watch right-leaning networks like Fox News tend to support Trump. The trend of Republicans gravitating towards Fox News and Democrats towards CNN can be attributed to several factors. Firstly, media outlets often tailor their content to align with the political leanings of their target audience. Fox News has positioned itself as a conservative-leaning network, catering to viewers who identify with Republican values and ideologies. Conversely, CNN has adopted a more liberal-leaning stance, appealing to viewers who align with Democratic principles.
+There is a clear correlation between media preferences and voting decisions. Viewers of left-leaning networks like CNN and MSNBC are more likely to vote for Biden, while those who watch right-leaning networks like Fox News tend to support Trump. The trend can be explained by media outlets tailoring their content to align with the political leanings of their target audience. As a conservative network catering to Republican viewers, Fox News hosts like Sean Hannity and Tucker Carlson are known for their outspoken support of Republican policies and politicians. Conversely, to appeal to their Democrat viewers, CNN features prominent liberal personalities such as Anderson Cooper. Additionally, increased viewing of content with political implications might further reinforce the viewers' beliefs. For example, Republicans watching Fox News often encounter content that reinforces their conservative beliefs, solidifying their support for right-wing causes and candidates.
 
-Another factor contributing to this phenomenon is the presence of partisan echo chambers within media consumption. Republicans who watch Fox News are likely to encounter content that reinforces their existing beliefs and perspectives, creating a feedback loop that solidifies their support for conservative causes and candidates. Similarly, Democrats who tune into CNN may find their views validated and amplified, further strengthening their allegiance to liberal ideals and candidates.
+While the impact of media on the Republicans and Democrats is fairly straightforward, media networks have a more complex impact on voters who do not belong to the two major parties. Independents who watch Fox News are more likely to vote for Trump than those who don't, and those who watch CNN are more likely to vote for Biden than those who don't. This fact further proves the assumption of the influence of media on voters, especially the "unbiased" ones. The influence of left media networks such as CNN on independent voters seems to be larger than that of right media such as Fox News. Independent voters who watch CNN have a higher likelihood of voting for Biden compared to the Trump-supporting rate from those who watch Fox News. There might be various explanations for this scenario. Firstly, other than Fox News, most of the mainstream media networks are more or less pro-Democrat. Therefore, independent voters on average would be more exposed to Democratic opinions and ideas if they spend time watching national news. In addition, as analyzed in the previous section, more Independents are liberal-leaning; therefore, they are more likely to watch liberal news and vote for Biden.
 
-Furthermore, the proliferation of political punditry and opinion-based programming on both networks plays a role in shaping viewer preferences. Fox News hosts like Sean Hannity and Tucker Carlson are known for their outspoken support of Republican policies and politicians, attracting conservative viewers who value their commentary. On the other hand, CNN features prominent personalities such as Anderson Cooper and Don Lemon, whose coverage often aligns with Democratic positions, resonating with liberal audiences.
+The relationship between media networks and Independent voters' votes suggests that media consumption plays a significant role in shaping political attitudes and voting behaviour. This finding is highly useful for political figures who attempt to use media to promote their campaigns and ideas. To increase the likelihood of being supported by Independent voters, politicians use media platforms to attract them and deliver messages and policy proposals that resonate with them.   
 
-The results highlight the partisan divide in media consumption, with Democrats favoring liberal-leaning networks and Republicans favoring conservative-leaning ones. This polarization in media consumption reflects broader political polarization in society and underscores the role of media as a driver of ideological divisions.  
-
-While the relationship of voter watching the network that supports his own party is straightforward, media networks have more complex impact on voters who do not belong to the two major parties. Independents who watch Fox News are more likely to vote for Trump than those who don't; and those who watch CNN are more likely to vote for Biden than those who don't. This fact further proves the assumption of the influence of media on voters, especially the "unbiased" ones. 
-
-Additionally, the influence of left media network such as CNN on independent voters seem to be larger than that of right media such as Fox News. Independent voters who watch CNN has a higher likelihood of voting for Biden compared the Trump supporting rate from those who watches Fox News. There might be various explanations for this scenario. Firstly, other than Fox News, most of the main stream media networks are more or less pro Democrat. Therefore, independent voters on average would be more exposed to Democratic opinions and ideas if they spend time watching national news. In addition, as analyzed in the previous section, more Independents are liberal leaning; therefore, they are more likely to watch liberal news and vote for Biden .
-
-The relationship of media networks and Independent voters' votes suggests that media consumption plays a significant role in shaping political attitudes and voting behavior. This finding is highly useful for political figures who attempt to use media as an outlet to promote their campaigns and ideas. To maximize their votes, they should prioritize on using media platforms to attract voters who do not belong to the two major parties. By effectively utilizing these platforms, they can amplify their messages and policy proposals to resonate with independent voters who may not align strictly with either major party. Understanding the preferences and viewing habits of independent voters in relation to media consumption can inform targeted outreach and messaging strategies. Political campaigns can tailor their content and advertising efforts to align with the interests and concerns of independent voters, thereby increasing the likelihood of garnering their support.
 
 
 ## Policy Implications
 
-The significant influence of media on political attitudes could be harmful to society if not regulated. Press and media with strong political leans are prone to misguide their audiences with tactiful words. In the past, there has been long histories where press selectively uses words like "slander" and "liar" to dismiss undirable statements and "honest" and "honerable" to defend people they support [@gentzkow2004rise]. While this trend has been diminishing over decades, media's political standpoint are still discernable through their reports. Researchers at Carnegie Mellon University has found that the left and right media with opposite political views often use completely different words to describe the same idea [@knight2020left]. Strategically phrasing their reports, they are able to turn the result in their favour. Therefore, there is a need for robust regulation to ensure accountability and accuracy in reporting. Policymakers may consider measures to promote transparency in media ownership, combat misinformation, and uphold journalistic standards 
-It is important to educate voters in media literacy; they should be equipped with the skills to critically evaluate media sources, discern bias, and distinguish between factual reporting and opinion. 
+The significant influence of media on political attitudes could be harmful to society if not regulated. Press and media with strong political leans are prone to misguide their audiences with tactful words. In the past, there have been long histories where the press selectively uses words like "slander" and "liar" to dismiss undesirable statements and "honest" and "honourable" to defend people they support [@gentzkow2004rise]. While this trend has been diminishing over decades, the media's political standpoint is still noticeable through their reports. Researchers at Carnegie Mellon University have found that the left and right media with opposite political views often use completely different words to describe the same idea [@knight2020left]. Strategically phrasing their reports, they are able to turn the result in their favour. Therefore, policymakers may consider making regulations to ensure accountability and accuracy in reporting. It is equally important to educate voters in media literacy; they should be equipped with the skills to critically evaluate media sources, discern bias, and distinguish between factual reporting and opinion. 
 
 
 ## Weaknesses and Next Steps
 
-While clear correlation between voters' media preferences and their voting decision is discovered, the paper's main weakness lies in the fact that it does not address endogeneity issues, specifically reverse causality. Media consumption may not solely influence voting decisions; individuals predisposed to certain candidates may selectively consume media aligning with their existing beliefs. For example, Trump supporters may favor Fox News, while Biden supporters may prefer CNN.
+While a clear correlation between voters' media preferences and their voting decisions is discovered, the paper's main weakness lies in the fact that it does not address endogeneity issues, specifically reverse causality. Media consumption may not solely influence voting decisions; individuals predisposed to certain candidates may selectively consume media aligning with their existing beliefs. For example, Trump supporters may favour Fox News, while Biden supporters may prefer CNN.
 
-Additionally, the missing data in this study introduces inaccuracies in the findings. Despite starting with over 60,000 observations, only 10,000 remained after data cleaning. This loss of data, particularly in variables such as TV type, where the category "Local Newscast" was entirely eliminated, raises concerns about the representativeness of the sample. By excluding individuals who exclusively consume local news, I might overlook potentially significant insights into how their media consumption habits may influence voting behavior.
+Additionally, the missing data in this study introduces inaccuracies in the findings. Despite starting with over 60,000 observations, only 10,000 remained after data cleaning. This loss of data, particularly in variables such as TV type, where the category "Local Newscast" was entirely eliminated, raises concerns about the representativeness of the sample. By excluding individuals who exclusively consume local news, I might overlook potentially significant insights into how their media consumption habits may influence voting behaviour.
 
-In order to resolve endogeneity concerns, methods such as instrumental variable could be employed in the future to infer causality. More socioeconomic indicator controls such as income levels and education could be added to bring more understanding of voting dynamics. To observe the full influence of TV type on voting outcome, this variable has to be separated from the media variables in a separate model so that all three values of this variable can be examined. 
+In order to resolve endogeneity concerns, methods such as instrumental variables could be employed in the future to infer causality. More socioeconomic indicator controls such as income levels and education could be added to bring more understanding of voting dynamics. To observe the full influence of TV type on the voting outcome, this variable has to be separated from the media variables in a separate model so that all three values of this variable can be examined. 
+
 
 
 \newpage
