@@ -1,4 +1,4 @@
-# "Fake News" vs Fox News: Exploring the Influence of Media Preferences on Voting Behavior in the 2020 U.S. Presidential Election Among Voters from Different Parties
+# Fake News vs Fox News: The Influence of Media Preferences on Voting Behavior in the 2020 U.S. Presidential Election Among Party Voters
 
 ## Overview
 
@@ -12,9 +12,9 @@ To use this folder, click the green "Code" button", then "Download ZIP". Move th
 
 The repo is structured as:
 
--   `data/raw_data` contains the raw data as obtained from CES study.
+-   `data/raw_data` contains the raw data as obtained from the CES study.
 -   `data/analysis_data` contains the cleaned dataset that was constructed.
--   `model` contains fitted models. 
+-   `models` contains fitted model. 
 -   `other` contains details about LLM chat interactions and sketches.
 -   `paper` contains the files used to generate the paper, including the Quarto document, datasheet, and reference bibliography file, as well as the PDF of the paper. 
 -   `scripts` contains the R scripts used to simulate, download, test, and clean data.
