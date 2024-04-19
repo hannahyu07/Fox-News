@@ -263,8 +263,8 @@ plot_ABC <- ggplot(ces2020, aes(x = factor(ABC), fill = factor(voted_for))) +
   geom_bar(position = "dodge") +
   labs(title = "ABC", x = "ABC", y = "Count") +
   scale_fill_manual(values = c("red", "blue")) +  # Specify colors for Biden and Trump
-  theme(plot.title = element_text(hjust = 0.5)) +
   theme_minimal()+
+  theme(plot.title = element_text(hjust = 0.5)) +
   theme(legend.position="none")
 
 plot_CBS <- ggplot(ces2020, aes(x = factor(CBS), fill = factor(voted_for))) +
