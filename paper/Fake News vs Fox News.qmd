@@ -94,7 +94,7 @@ The remainder of this paper is structured as follows: @sec-data demonstrates the
 
 # Data {#sec-data}
 
-Data analysis is performed using statistical programming language R [@citeR], with packages `tidyverse` [@citeTidyverse], `here` [@citeHere], `rstanarm` [@citeRstanarm], `modelsummary` [@citeModleSummary], `ggplot2` [@citeGgplot2], `knitr` [@citeKnitr], `marginaleffects` [@citeMarginalEffects], `plotly` [@citePlotly], `tibble` [@citeTibble], `margins` [@citeMargins], `testthat` [@citetestthat], `kableExtra` [@citeKableExtra], `arrow` [@citeArrow], `gridExtra` [@citeGridExtra], and `dataverse` [@citeDataverse].
+Data analysis is performed using statistical programming language R [@citeR], with packages `tidyverse` [@citeTidyverse], `here` [@citeHere], `rstanarm` [@rstanarm], `modelsummary` [@citeModleSummary], `ggplot2` [@citeGgplot2], `knitr` [@citeKnitr], `marginaleffects` [@citeMarginalEffects], `plotly` [@citePlotly], `tibble` [@citeTibble], `margins` [@citeMargins], `testthat` [@citetestthat], `kableExtra` [@citeKableExtra], `arrow` [@citeArrow], `gridExtra` [@citeGridExtra], and `dataverse` [@citeDataverse].
 
 ## Data Source
 
@@ -221,7 +221,7 @@ ces2020 %>%
 ## Data Measurement
 Because the data was collected from surveys, there might be some inconsistencies and misinterpretations of the questions in people's responses. Therefore this section discusses what the variables are measuring. 
 
-Firstly, for the variable `votereg` indicating whether a respondent is registered to vote, the variable relies on self-reported information from survey respondents. Due to the inefficiencies of the US voter registration system, people who misunderstood their voter registration status might falsely report their condition. For example, some individuals might believe they reached the status simply because they are of age but did not actually register at their local office. According to @inaccurate, there are millions of voter registrations that are no longer valid or inaccurate. 
+Firstly, for the variable `votereg` indicating whether a respondent is registered to vote, the variable relies on self-reported information from survey respondents. Due to the inefficiencies of the US voter registration system, people who misunderstood their voter registration status might falsely report their condition. For example, some individuals might believe they reached the status simply because they are of age but did not actually register at their local office. According to @inaccurate, there are millions of voter registrations that are innaccurate or no longer valid. 
 
 Representing the presidential candidate the respondent voted for, `CC20_410` considers recall bias, social desirability bias, and people's reported presidential candidate preference. Trump had made many controversial speeches throughout his presidency that contributed to his polarizing image and unpopularity in mainstream media. Therefore, many of his voters would conceal their support due to social pressure, potentially leading to under-reporting of votes for Trump in the survey data.
 
@@ -260,8 +260,8 @@ plot_ABC <- ggplot(ces2020, aes(x = factor(ABC), fill = factor(voted_for))) +
   geom_bar(position = "dodge") +
   labs(title = "ABC", x = "ABC", y = "Count") +
   scale_fill_manual(values = c("red", "blue")) +  # Specify colors for Biden and Trump
-  theme_minimal()+
   theme(plot.title = element_text(hjust = 0.5)) +
+  theme_minimal()+
   theme(legend.position="none")
 
 plot_CBS <- ggplot(ces2020, aes(x = factor(CBS), fill = factor(voted_for))) +
@@ -305,13 +305,14 @@ plot_MSNBC <- ggplot(ces2020, aes(x = factor(MSNBC, levels = c("Yes", "No")), fi
   theme(plot.title = element_text(hjust = 0.5))+
   theme(legend.position="none")
 
-plot_PBS <- ggplot(ces2020, aes(x = factor(PBS, levels = c("Yes", "No")), fill = "Voted for")) +
+plot_PBS <- ggplot(ces2020, aes(x = factor(PBS, levels = c("Yes", "No")), fill = voted_for)) +
   geom_bar(position = "dodge") +
   labs(title = "PBS", x = "PBS", y = "Count") +
   scale_fill_manual(values =  c("red", "blue")) +  # Specify colors for Biden and Trump
   theme_minimal()+
   theme(plot.title = element_text(hjust = 0.5)) +
-  theme(legend.position="none")
+  theme(legend.position="none")+
+  labs(fill = "Voted for")
 
 
 
@@ -458,7 +459,7 @@ The intercept and coefficients are assigned informative prior distributions to r
 
 This modeling approach is chosen for several reasons. Firstly, logistic regression is well-suited for binary outcome variables, making it appropriate for analyzing voting behavior. Additionally, Bayesian methods enables the incorporation of prior knowledge and uncertainty into the analysis, which provides more robust estimates of the model parameters. Alternative modeling approaches, such as linear regression models, were also considered. However, Bayesian logistic regression is chosen to fit the resulting binary variable of voter's decision.
 
-I run the model in R [@citeR] using the `rstanarm` package of [@citeRstanarm]. I use the default priors from `rstanarm`. Rstanarm employs Markov chain Monte Carlo (MCMC) techniques to estimate the posterior distribution of the parameters. I randomly sampled 2500 observations to fit the model to avoid excessive run time. 
+I run the model in R [@citeR] using the `rstanarm` package of [@rstanarm]. I use the default priors from `rstanarm`. Rstanarm employs Markov chain Monte Carlo (MCMC) techniques to estimate the posterior distribution of the parameters. I randomly sampled 2500 observations to fit the model to avoid excessive run time. 
 
       
 
@@ -534,12 +535,12 @@ The relationship between media networks and Independent voters' votes suggests t
 
 ## Policy Implications
 
-The significant influence of media on political attitudes could be harmful to society if not regulated. Press and media with strong political leans are prone to misguide their audiences with tactful words. In the past, there have been long histories where the press selectively uses words like "slander" and "liar" to dismiss undesirable statements and "honest" and "honourable" to defend people they support [@gentzkow2004rise]. While this trend has been diminishing over decades, the media's political standpoint is still noticeable through their reports. Researchers at Carnegie Mellon University have found that the left and right media with opposite political views often use completely different words to describe the same idea [@knight2020left]. Strategically phrasing their reports, they are able to turn the result in their favour. Therefore, policymakers may consider making regulations to ensure accountability and accuracy in reporting. It is equally important to educate voters in media literacy; they should be equipped with the skills to critically evaluate media sources, discern bias, and distinguish between factual reporting and opinion. 
+The significant influence of media on political attitudes could be harmful to society if not regulated. Press and media with strong political leans are prone to misguide their audiences with tactful words. In the past, there have been long histories where the press selectively uses words like "slander" and "liar" to dismiss undesirable statements and "honest" and "honourable" to defend people they support [@gentzkow2004rise]. While this trend has been diminishing over the years, the media's political standpoint is still noticeable through their reports. Researchers at Carnegie Mellon University have found that the left and right media with opposite political views often use completely different words to describe the same idea [@knight2020left]. Strategically phrasing their reports, they are able to turn the result in their favour. Therefore, policymakers may consider making regulations to ensure accountability and accuracy in reporting. It is equally important to educate voters in media literacy; they should be equipped with the skills to critically evaluate media sources and distinguish between factual reporting and opinion. 
 
 
 ## Weaknesses and Next Steps
 
-While a clear correlation between voters' media preferences and their voting decisions is discovered, the paper's main weakness lies in the fact that it does not address endogeneity issues, specifically reverse causality. Media consumption may not solely influence voting decisions; individuals predisposed to certain candidates may selectively consume media aligning with their existing beliefs. For example, Trump supporters may favour Fox News, while Biden supporters may prefer CNN.
+While a clear correlation between voters' media preferences and their voting decisions is discovered, the paper's main weakness lies in the fact that it does not address endogeneity issues, specifically reverse causality. Media consumption may not solely influence voting decisions; individuals favouring certain candidates may selectively consume media aligning with their existing beliefs. For example, instead of watching Fox News making people to support Trump, people might watch Fox News because they already support Trump and the things Fox News stands for. 
 
 Additionally, the missing data in this study introduces inaccuracies in the findings. Despite starting with over 60,000 observations, only 10,000 remained after data cleaning. This loss of data, particularly in variables such as TV type, where the category "Local Newscast" was entirely eliminated, raises concerns about the representativeness of the sample. By excluding individuals who exclusively consume local news, I might overlook potentially significant insights into how their media consumption habits may influence voting behaviour.
 
