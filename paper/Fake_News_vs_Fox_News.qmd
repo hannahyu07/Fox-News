@@ -3,7 +3,7 @@ title: "Fake News vs Fox News"
 subtitle: "The Influence of Media Preferences on Voting Behavior in the 2020 U.S. Presidential Election Among Party Voters"
 author: 
   - Hannah Yu
-thanks: "Code and data are available at: https://github.com/hannahyu07/Fox-News. Special thanks to my dear friends Luca Carnegie and Chaitanya Khamar for their love and support; this paper would not have been done so beautifully without your generous help and ideas. Special thanks for Rohan Alexander for his wonderful help and continual support. "
+thanks: "Code and data are available at: https://github.com/hannahyu07/Fox-News. Special thanks to my dear friends Luca Carnegie and Chaitanya Khamar for their love and support; this paper would not have been done so beautifully without your generous help and ideas. Special thanks to Rohan Alexander for his wonderful help and continual support. "
 date: today
 date-format: long
 abstract: "Media consumption has a notable impact on voting behaviour, with the most influential example in the 2020 US presidential elections. Using logistic regression and data from the Cooperative Election Study (CES 2020), I analyze the relationship between watching specific media networks and voting for either Trump or Biden among Democrat, Republican, Independent, and Other voters. The analysis shows that viewing political-leaning networks significantly impacts voting preferences among voters from all party backgrounds, with CNN viewers more likely to support Biden and Fox News viewers favouring Trump. The findings highlight the media’s role in shaping electoral outcomes, especially its influence on Independent voters, and the importance of addressing challenges posed by media polarization."
