@@ -6,7 +6,7 @@ author:
 thanks: "Code and data are available at: https://github.com/hannahyu07/Fox-News"
 date: today
 date-format: long
-abstract: "Media consumption causes major impacts on the voting behvaior of a population base, with the most influential example being visible in the 2020 US presidential elections. Using logistic regression and data from the Cooperative Election Study (CES 2020), I analyze the relationship between watching specific media networks and voting for either Trump or Biden among Democrat, Republican, Independent, and Other voters. The analysis shows that viewing political-leaning networks significantly impacts voting preferences among voters from all party backgrounds, with CNN viewers more likely to support Biden and Fox News viewers favouring Trump. The findings highlight the media’s role in shaping electoral outcomes, especially its influence on Independent voters, and the importance of addressing challenges posed by media polarization."
+abstract: "Media consumption has a notable impact on voting behaviour, with the most influential example in the 2020 US presidential elections. Using logistic regression and data from the Cooperative Election Study (CES 2020), I analyze the relationship between watching specific media networks and voting for either Trump or Biden among Democrat, Republican, Independent, and Other voters. The analysis shows that viewing political-leaning networks significantly impacts voting preferences among voters from all party backgrounds, with CNN viewers more likely to support Biden and Fox News viewers favouring Trump. The findings highlight the media’s role in shaping electoral outcomes, especially its influence on Independent voters, and the importance of addressing challenges posed by media polarization."
 format: pdf
 toc: true
 number-sections: true
@@ -86,9 +86,9 @@ ces2020 <-
 # Introduction
 The 2020 U.S. presidential election, between Republican candidate and incumbent President Donald Trump, and Democratic candidate and former Vice President Joe Biden, was one of the most intense in recent history. Trump's many controversial statements while in office and his administration's mishandling of the pandemic widened the divide between the two parties during this election period. This division was reflected in the media outlets favored by each party, with Fox News being known as the conservative media network highly favored by Republicans, while CNN leads as the Democrats' favorite. 
 
-The division of media was exacerbated by Trump's animosity against liberal networks. Trump famously labeled any unflattering issues that might work against him as "Fake News" [@timm2020trump]. He even handed out the "Fake News Award" through Twitter to several notable liberal media outlets, including CNN [@siddiqui2018trump]. On the other hand, Democrats also have long-standing feuds with the Republican network Fox News. Biden has referred to Fox News as "one of the most destructive forces in the United States" [@stelter2022biden]. With clear political alliances, these different media outlets might subtly influence their viewers' political ideology and voting decisions using their content. Therefore, it is important to explore whether these media networks do indeed have influences on election outcomes and, if so, the magnitude of that effect. A good understanding of this relationship could enable voters to be more critical of the media they consume.
+The division of media was exacerbated by Trump's animosity against liberal networks. Trump famously labelled any unflattering issues that might work against him as "Fake News" [@timm2020trump]. He even handed out the "Fake News Award" through Twitter to several notable liberal media outlets, including CNN [@siddiqui2018trump]. On the other hand, Democrats also have long-standing feuds with the Republican network Fox News. Biden has referred to Fox News as "one of the most destructive forces in the United States" [@stelter2022biden]. With clear political alliances, these different media outlets might subtly influence their viewers' political ideology and voting decisions using their content. Therefore, it is important to explore whether these media networks have influences on election outcomes and, if so, the magnitude of that effect. A good understanding of this relationship could enable voters to be more critical of the media they consume.
 
-To explore and answer these questions, this paper analyzes the influence of watching specific media on voters' voting behavior. It uses the 2020 US election data from the Cooperative Election Study (CES), which surveys Americans before and after elections @citeCes2020. From the dataset, I gathered information on voters' media preferences on America's most prominent networks, including ABC, CNN, Fox News, etc. Then, I used a Bayesian logistic regression model to estimate the election outcome between Trump and Biden based on voters' media preferences and their original party affiliation. The estimand of this paper is the actual number of people who supported Trump or Biden during the 2020 election. However, due to the difficulty of collecting data on millions of voters, this paper estimates the estimand using the logistic regression model trained using a sample from the CES dataset. The findings indicate that watching media networks with specific political ideologies is associated with higher chances of voting for the candidate they prefer. Among all networks, this relationship is most apparent in CNN and Fox News, exerting heavy influence on voters who classify as "Independent" or "Other." Additionally, this paper also studies the influence of watching national newscasts on voting outcomes compared to watching both national and local newscasts, finding no significant differences between the outcomes of the two.
+To explore and answer these questions, this paper analyzes the influence of watching specific media on voters' voting behavior. It uses the 2020 US election data from the Cooperative Election Study (CES), which surveys Americans before and after elections [@citeCes2020]. From the dataset, I gathered information on voters' media preferences on America's most prominent networks, including ABC, CNN, Fox News, etc. Then, I used a Bayesian logistic regression model to estimate the election outcome between Trump and Biden based on voters' media preferences and their original party affiliation. The estimand of this paper is the actual number of people who supported Trump or Biden during the 2020 election. However, due to the difficulty of collecting data on millions of voters, this paper estimates the estimand using the logistic regression model trained using a sample from the CES dataset. The findings indicate that watching media networks with specific political ideologies is associated with higher chances of voting for the candidate they prefer. Among all networks, this relationship is most apparent in CNN and Fox News, exerting heavy influence on voters who classify as "Independent" or "Other." Additionally, this paper also studies the influence of watching national newscasts on voting outcomes compared to watching both national and local newscasts, finding no significant differences between the outcomes of the two.
 
 The remainder of this paper is structured as follows: @sec-data demonstrates the data used for this paper, @sec-model builds the model and discusses its justification and explanation, @sec-results highlights the results of the predictions using tables and graphs, and @sec-discussion contains discussions conducted based on the findings. These discussions address the voting prediction results based on TV types, party affiliation, and media influence, and discuss policy implications from the study.
 
@@ -98,7 +98,7 @@ Data analysis is performed using statistical programming language R [@citeR], wi
 
 ## Data Source
 
-Data for this research comes from the 2020 Cooperative Election Study (CES) [@citeCes2020], an annual US political survey. The CES contains information about Americans' political views, voting behaviours and experiences across various political geography and social contexts. 61,000 American adults participated in the survey in 2020. This dataset is favoured over other available datasets because of its large observation numbers and wide-ranging information collected from the respondents.  
+Data for this research comes from the 2020 Cooperative Election Study (CES), an annual US political survey [@citeCes2020]. The CES contains information about Americans' political views, voting behaviours and experiences across various political geography and social contexts. 61,000 American adults participated in the survey in 2020. This dataset is favoured over other available datasets because of its large observation numbers and wide-ranging information collected from the respondents.  
 
 ## Data Cleaning and Variables
 
@@ -329,7 +329,7 @@ legend <- g_legend(plot_PBS + theme(legend.position='bottom'))
 grid.arrange(plot_ABC, plot_CBS, plot_NBC, plot_CNN, plot_Fox_News, plot_MSNBC, plot_PBS, plot_Other, legend, nrow = 3)
 
 ```
-@fig-network depicts the relationship between voters' voting preference and media network preference. Given that more voters supported Biden, it's evident that Biden supporters tend to watch more media networks overall. Consequently, I analyze the proportions of voters watching specific networks and their voting preferences.  Biden supporters have higher proportions of watching most networks. Among all the networks that have higher proportions of Biden voters, CNN and MSNBC, two of the most Democratic-leaning news networks, have significantly higher proportions of viewers that are Biden supporters and barely any viewers that support Trump. The only network that is being consumed by Trump supporters is Fox News, a network known to be Republican-leaning. 
+@fig-network depicts the relationship between voters' voting preference and media network preference. Given that more voters supported Biden, it's evident that Biden supporters tend to watch more media networks overall. Consequently, I analyze the proportions of voters watching specific networks and their voting preferences.  Biden supporters have higher proportions of watching most networks. Among all the networks that have higher proportions of Biden voters, CNN and MSNBC, two of the most Democratic-leaning news networks, have significantly higher proportions of viewers that are Biden supporters and barely any viewers that support Trump. The only network that is being heavily consumed by Trump supporters is Fox News, a network known to be Republican-leaning. 
 
 ```{r}
 #| label: fig-party
@@ -342,7 +342,7 @@ grid.arrange(plot_ABC, plot_CBS, plot_NBC, plot_CNN, plot_Fox_News, plot_MSNBC, 
 ggplot(ces2020, aes(x = voted_for, fill = voted_for)) +
   geom_bar() +
   facet_wrap(facets = vars(Party)) +
-  labs(title = "Relationship Between Party Affiliation and Voting Behaviour",
+  labs(
        x = "Vote",
        y = "Count",
        color = "Voted for Biden (1) or Trump (0)") +
@@ -365,7 +365,7 @@ ggplot(ces2020, aes(x = voted_for, fill = voted_for)) +
 ggplot(ces2020, aes(x = Fox_News, fill = voted_for)) +
   geom_bar() +
   facet_wrap(facets = vars(Party)) +
-  labs(title = "Relationship between Fox News Consumption and Voting Behavior by Party",
+  labs(
        x = "Fox News",
        y = "Count",
        color = "Voted for Biden (1) or Trump (0)") +
@@ -386,7 +386,7 @@ For @fig-foxnews, almost all Democrat-identifying respondents voted for Biden an
   ggplot(ces2020, aes(x = CNN, fill = voted_for)) +
     geom_bar() +
     facet_wrap(facets = vars(Party)) +
-    labs(title = "Relationship between CNN Consumption and Voting Behaviour by Party",
+    labs(
          x = "CNN",
          y = "Count",
          color = "Voted for Biden (1) or Trump (0)") +
@@ -412,7 +412,7 @@ ces2020$TV_type <- factor(ces2020$TV_type, labels = c("National & Local", "Natio
       geom_bar() +
       facet_wrap(facets = vars(Party)) +
       labs(
-        title = "Relationship Between TV News Consumption and Voting Behaviour by Party",
+        
         x = "TV Type",
         y = "Count",
         color = "Voted for Biden (1) or Trump (0)"
@@ -452,7 +452,7 @@ y_i|\pi_i &\sim \mbox{Bern}(\pi_i) \\
 \end{align}
 
 
-In this model, $y_i$ represents the binary outcome variable indicating whether an individual voted Biden (as opposed to Trump). The probability of voting for the Biden ($\pi_i$) is modeled using a logistic link function (\text{logit}($\pi_i$)), which is a linear combination of the intercept ($\alpha$) and the coefficients ($\beta_1$, $\beta_2$, $\beta_3$, $\beta_4$, $\beta_5$, $\beta_6$, $\beta_7$, $\beta_8$, $\beta_9$, $\beta_10$)) corresponding to the predictor variables media use networks, TV news type, and party affiliations, respectively. Media use networks are being represented by the following predictor variables:  $\text{ABC}_i$, $\text{CBS}_i$, $\text{NBC}_i$, $\text{CNN}_i$, $\text{Fox\_News}_i$, $\text{MSNBC}_i$, $\text{PBS}_i$, $\text{Other}_i$. The rest of the predictor variables are denoted as $\text{TV\_type}_i$ and $\text{Party}_i$, where $i$ indexes the individuals in the dataset.
+In this model, $y_i$ represents the binary outcome variable indicating whether an individual voted Biden (as opposed to Trump). The probability of voting for the Biden ($\pi_i$) is modeled using a logistic link function (\text{logit}($\pi_i$)), which is a linear combination of the intercept ($\alpha$) and the coefficients ($\beta_1$, $\beta_2$, $\beta_3$, $\beta_4$, $\beta_5$, $\beta_6$, $\beta_7$, $\beta_8$, $\beta_9$, $\beta_{10}$)) corresponding to the predictor variables media use networks, TV news type, and party affiliations, respectively. Media use networks are being represented by the following predictor variables:  $\text{ABC}_i$, $\text{CBS}_i$, $\text{NBC}_i$, $\text{CNN}_i$, $\text{Fox\_News}_i$, $\text{MSNBC}_i$, $\text{PBS}_i$, $\text{Other}_i$. The rest of the predictor variables are denoted as $\text{TV\_type}_i$ and $\text{Party}_i$, where $i$ indexes the individuals in the dataset.
 
 
 The intercept and coefficients are assigned informative prior distributions to regularize the model. Specifically, a normal distribution with a mean of 0 and a standard deviation of 2.5 for each parameter is assumed.
@@ -489,7 +489,7 @@ political_preferences <-
 #| echo: false
 #| eval: true
 #| label: tbl-modelresults
-#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
+#| tbl-cap: "Explanatory Models for Political Preferences (n = 2500)"
 #| warning: false
 
 modelsummary(
