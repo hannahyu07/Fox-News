@@ -6,7 +6,7 @@ author:
 thanks: "Code and data are available at: https://github.com/hannahyu07/Fox-News"
 date: today
 date-format: long
-abstract: "This study examines the impact of media consumption on voting behaviour in the 2020 U.S. presidential election with data from the Cooperative Election Study (CES 2020). Using logistic regression, I analyze the relationship between watching specific media networks and voting for either Trump or Biden among Democrat, Republican, Independent, and Other voters. The analysis shows that viewing political-leaning networks significantly impacts voting preferences among voters from all party backgrounds, with CNN viewers more likely to support Biden and Fox News viewers favouring Trump. The findings highlight the media’s role in shaping electoral outcomes, especially its influence on Independent voters, and the importance of addressing challenges posed by media polarization."
+abstract: "Media consumption causes major impacts on the voting behvaior of a population base, with the most influential example being visible in the 2020 US presidential elections. Using logistic regression and data from the Cooperative Election Study (CES 2020), I analyze the relationship between watching specific media networks and voting for either Trump or Biden among Democrat, Republican, Independent, and Other voters. The analysis shows that viewing political-leaning networks significantly impacts voting preferences among voters from all party backgrounds, with CNN viewers more likely to support Biden and Fox News viewers favouring Trump. The findings highlight the media’s role in shaping electoral outcomes, especially its influence on Independent voters, and the importance of addressing challenges posed by media polarization."
 format: pdf
 toc: true
 number-sections: true
@@ -84,7 +84,7 @@ ces2020 <-
 
 
 # Introduction
-The 2020 U.S. presidential election, between Republican candidate and incumbent President Donald Trump, and Democratic candidate and former Vice President Joe Biden, was one of the most intense in recent history. Trump's many highly controversial statements while in office and his administration's mishandling of the pandemic widened the divide between the two parties during this election period. This division was reflected in the media outlets favored by each party, with Fox News being known as the conservative media network highly favored by Republicans, while CNN leads as the Democrats' favorite. 
+The 2020 U.S. presidential election, between Republican candidate and incumbent President Donald Trump, and Democratic candidate and former Vice President Joe Biden, was one of the most intense in recent history. Trump's many controversial statements while in office and his administration's mishandling of the pandemic widened the divide between the two parties during this election period. This division was reflected in the media outlets favored by each party, with Fox News being known as the conservative media network highly favored by Republicans, while CNN leads as the Democrats' favorite. 
 
 The division of media was exacerbated by Trump's animosity against liberal networks. Trump famously labeled any unflattering issues that might work against him as "Fake News" [@timm2020trump]. He even handed out the "Fake News Award" through Twitter to several notable liberal media outlets, including CNN [@siddiqui2018trump]. On the other hand, Democrats also have long-standing feuds with the Republican network Fox News. Biden has referred to Fox News as "one of the most destructive forces in the United States" [@stelter2022biden]. With clear political alliances, these different media outlets might subtly influence their viewers' political ideology and voting decisions using their content. Therefore, it is important to explore whether these media networks do indeed have influences on election outcomes and, if so, the magnitude of that effect. A good understanding of this relationship could enable voters to be more critical of the media they consume.
 
@@ -210,7 +210,7 @@ ces2020 %>%
 ces2020 %>%
   select(7:11) %>%
   summary() %>%
-  kable(booktabs = TRUE, linesep = "") %>%
+  kable(booktabs = TRUE, linesep = "" ) %>%
   kable_styling(position = "left", bootstrap_options = "condensed", full_width = FALSE)
 
 
